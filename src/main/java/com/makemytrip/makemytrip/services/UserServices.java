@@ -24,12 +24,29 @@ public class UserServices {
 
     public Users signup(Users user) {
         if (userRepository.findByEmail(user.getEmail()) != null) {
-            throw new RuntimeException("Email already exists");
+            throw new RuntimeException("Email is already registered");
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode((user.getPassword())));
         if (user.getRole() == null) {
             user.setRole("USER");
         }
         return userRepository.save(user);
+
     }
+
+    public Users getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public Users editprofile(String id, Users updatedUser) {
+        Users user = userRepository.findById(id).orElse(null);
+        if (user != null) {
+            user.setFirstName(updatedUser.getFirstName());
+            user.setLastName(updatedUser.getLastName());
+            user.setPhoneNumber(updatedUser.getPhoneNumber());
+            return userRepository.save(user);
+        }
+        return null;
+    }
+
 }

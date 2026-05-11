@@ -1,13 +1,12 @@
 import axios from "axios";
 
-const BACKEND_URL = "your backend url";
+const BACKEND_URL = "http://localhost:8081";
 
 export const login = async (email, password) => {
   try {
     const url = `${BACKEND_URL}/user/login?email=${email}&password=${password}`;
     const res = await axios.post(url);
     const data = res.data;
-    // console.log(data);
     return data;
   } catch (error) {
     throw error;
@@ -63,7 +62,7 @@ export const editprofile = async (
     });
     const data = res.data;
     return data;
-  } catch (error) {}
+  } catch (error) { }
 };
 export const getflight = async () => {
   try {
@@ -71,7 +70,7 @@ export const getflight = async () => {
     const data = res.data;
     return data;
   } catch (error) {
-    console.log(data);
+    // console.log(data);
   }
 };
 

@@ -4,24 +4,27 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
+    DialogTrigger,
+    DialogDescription,
 } from "./ui/dialog";
-import { DialogTrigger } from "@radix-ui/react-dialog";
 import { Button } from "./ui/button";
-import { DialogDescription } from "@radix-ui/react-dialog";
+// import { DialogDescription } from "@radix-ui/react-dialog";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { signup, login } from "../api";
 import { setUser } from "@/store";
 import { useDispatch } from "react-redux";
-const SignupDialog = ({ trigger }: any) => {
+
+const SignupDialog = () => {
     const [isSignup, setIsSignup] = useState(true);
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
-    const [open, setopem] = useState(false);
+    const [open, setOpen] = useState(false);
     const dispatch = useDispatch();
+
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
         if (isSignup) {
@@ -34,6 +37,7 @@ const SignupDialog = ({ trigger }: any) => {
                     password
                 );
                 dispatch(setUser(signin));
+                setOpen(false); // Close dialog on success
             } catch (error) {
                 console.log(error);
             }
@@ -41,13 +45,14 @@ const SignupDialog = ({ trigger }: any) => {
             try {
                 const data = await login(email, password);
                 dispatch(setUser(data));
-                setopem(false);
+                setOpen(false);
                 clearform();
             } catch (error) {
                 console.log(error);
             }
         }
     };
+
     const clearform = () => {
         setFirstName("");
         setLastName("");
@@ -55,10 +60,16 @@ const SignupDialog = ({ trigger }: any) => {
         setPassword("");
         setPhoneNumber("");
     };
+
     return (
-        <Dialog open={open} onOpenChange={setopem}>
-            <DialogTrigger asChild>
-                {trigger}
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger>
+                <Button
+                    variant="outline"
+                    className="bg-blue-600 text-white hover:bg-blue-700"
+                >
+                    Sign Up
+                </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] bg-white">
                 <DialogHeader>
@@ -72,6 +83,7 @@ const SignupDialog = ({ trigger }: any) => {
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleAuth} className="space-y-4 py-4">
+                    {/* ... rest of your form fields stay exactly the same ... */}
                     {isSignup && (
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
@@ -134,6 +146,7 @@ const SignupDialog = ({ trigger }: any) => {
                         {isSignup ? "Sign Up" : "Login"}
                     </Button>
                 </form>
+                {/* ... rest of your toggle buttons stay exactly the same ... */}
                 <div className="text-center text-sm">
                     {isSignup ? (
                         <>

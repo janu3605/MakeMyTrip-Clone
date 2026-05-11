@@ -1,5 +1,5 @@
 import React from "react";
-import { Facebook, X, Linkedin, Instagram } from "lucide-react";
+import { FaFacebook, FaInstagram, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 const Footer = () => {
     return (
         <footer className="bg-black text-gray-300 pt-12 pb-8">
@@ -126,16 +126,16 @@ const Footer = () => {
                     <div className="flex flex-col md:flex-row justify-between items-center">
                         <div className="flex space-x-6 mb-4 md:mb-0">
                             <a href="#" className="hover:text-white">
-                                <Instagram className="w-5 h-5" />
+                                <FaInstagram className="w-5 h-5" />
                             </a>
                             <a href="#" className="hover:text-white">
-                                <X className="w-5 h-5" />
+                                <FaXTwitter className="w-5 h-5" />
                             </a>
                             <a href="#" className="hover:text-white">
-                                <Linkedin className="w-5 h-5" />
+                                <FaLinkedin className="w-5 h-5" />
                             </a>
                             <a href="#" className="hover:text-white">
-                                <Facebook className="w-5 h-5" />
+                                <FaFacebook className="w-5 h-5" />
                             </a>
                         </div>
                         <p className="text-sm">
