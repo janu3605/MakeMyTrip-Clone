@@ -416,11 +416,7 @@ const BookHotelPage = () => {
                                             <DialogTitle>Login Required</DialogTitle>
                                         </DialogHeader>
                                         <p>Please log in to continue with your booking.</p>
-                                        <SignupDialog
-                                            trigger={
-                                                <Button className="w-full">Log In / Sign Up</Button>
-                                            }
-                                        />
+                                        <SignupDialog />
                                     </DialogContent>
                                 )}
                             </Dialog>
