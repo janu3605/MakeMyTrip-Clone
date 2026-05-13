@@ -1,83 +1,84 @@
 package com.makemytrip.makemytrip.services;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.makemytrip.makemytrip.dto.FlightStatusUpdate;
+import com.makemytrip.makemytrip.models.Flight;
+import com.makemytrip.makemytrip.repositories.FlightRepository;
 
 @Service
 public class FlightTrackingService {
 
+    @Autowired
+    private FlightRepository flightRepository;
+
     private final List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
-    private final Map<String, FlightStatusUpdate> activeFlights = new ConcurrentHashMap<>();
-    private final Random random = new Random();
+    private final Map<String, String> customReasons = new ConcurrentHashMap<>();
 
-    private final String[] reasons = {
-        "Severe Weather Conditions",
-        "Late Arrival of Inbound Aircraft",
-        "Technical Maintenance Check",
-        "Runway Congestion",
-        "Crew Scheduling Conflict"
-    };
-
-    public SseEmitter subscribe(String flightId) {
-        SseEmitter emitter = new SseEmitter(600000L); // 10 minute timeout
+    public SseEmitter subscribe() {
+        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
         this.emitters.add(emitter);
-
-        // Initialize mock data if this is the first time the flight is being tracked
-        activeFlights.putIfAbsent(flightId, new FlightStatusUpdate(
-                flightId, "BOARDING", "Gate 12 is now open", "N/A", 0
-        ));
-
         emitter.onCompletion(() -> this.emitters.remove(emitter));
-        emitter.onTimeout(() -> this.emitters.remove(emitter));
-
         return emitter;
     }
 
-    @Scheduled(fixedRate = 10000) // Simulation ticks every 10 seconds
-    public void simulateFlightProgress() {
-        activeFlights.forEach((id, flight) -> {
-            // 1. Advance progress if in air
-            if (flight.getStatus().equals("IN_AIR") && flight.getProgress() < 100) {
-                flight.setProgress(Math.min(100, flight.getProgress() + 5));
-                if (flight.getProgress() == 100) {
-                    flight.setStatus("LANDED");
-                    flight.setMessage("Arrived at destination");
-                }
+    @Scheduled(fixedRate = 10000) // Ticks every 10 seconds
+    public void tick() {
+        List<Flight> allFlights = flightRepository.findAll();
+        Map<String, FlightStatusUpdate> updates = new HashMap<>();
+        LocalDateTime now = LocalDateTime.now();
+
+        for (Flight f : allFlights) {
+            LocalDateTime dep = LocalDateTime.parse(f.getDepartureTime());
+            LocalDateTime arr = LocalDateTime.parse(f.getArrivalTime());
+
+            String status;
+            int progress = 0;
+            String message = "On Time";
+
+            // 1. Calculate Status based on System Clock
+            if (now.isBefore(dep.minusMinutes(10))) {
+                status = "SCHEDULED";
+                message = "Check-in Open";
+            } else if (now.isBefore(dep)) {
+                status = "BOARDING";
+                message = "Boarding at Gate 4";
+            } else if (now.isAfter(arr)) {
+                status = "LANDED";
+                progress = 100;
+                message = "Arrived Safely";
+            } else {
+                status = "IN_AIR";
+                // 2. Real-Time Progress Calculation
+                long total = Duration.between(dep, arr).toSeconds();
+                long elapsed = Duration.between(dep, now).toSeconds();
+                progress = (int) ((elapsed * 100) / total);
+                message = "En Route";
             }
 
-            // 2. Randomly trigger boarding to takeoff
-            if (flight.getStatus().equals("BOARDING") && random.nextInt(10) > 7) {
-                flight.setStatus("IN_AIR");
-                flight.setMessage("Flight is currently cruising");
-            }
-
-            // 3. Randomly trigger a delay
-            if (random.nextInt(20) == 1 && !flight.getStatus().equals("LANDED")) {
-                flight.setStatus("DELAYED");
-                flight.setReason(reasons[random.nextInt(reasons.length)]);
-                flight.setMessage("Departure time revised");
-            }
-
-            flight.setLastUpdated(java.time.LocalTime.now().toString());
-        });
-
-        broadcastUpdates();
+            updates.put(f.getId(), new FlightStatusUpdate(
+                    f.getId(), status, message, customReasons.getOrDefault(f.getId(), "N/A"), progress
+            ));
+        }
+        broadcast(updates);
     }
 
-    private void broadcastUpdates() {
+    private void broadcast(Object data) {
         for (SseEmitter emitter : emitters) {
             try {
-                emitter.send(SseEmitter.event().name("flight-status").data(activeFlights));
+                emitter.send(SseEmitter.event().name("flight-status").data(data));
             } catch (IOException e) {
                 emitters.remove(emitter);
             }

@@ -3,6 +3,8 @@ import Loader from "@/components/Loader";
 import { SearchSelect } from "@/components/SearchSelect";
 import SignupDialog from "@/components/SignupDialog";
 import { Button } from "@/components/ui/button";
+import { useGlobalFlightTracking } from "@/hooks/useGlobalFlightTracking";
+import { LiveTracker } from "@/components/Flights/LiveTracker";
 import {
   Bus,
   Calendar,
@@ -139,12 +141,19 @@ export default function Home() {
     return <Loader />;
   }
   const handlesearch = () => {
+    const now = new Date();
+
     if (bookingtype === "flights") {
-      const results = flight.filter(
-        (FLIGHT) =>
+      const results = flight.filter((FLIGHT) => {
+        const departure = new Date(FLIGHT.departureTime);
+        const timeDiffMinutes = (departure.getTime() - now.getTime()) / (1000 * 60);
+
+        return (
           FLIGHT.from.toLowerCase() === from.toLowerCase() &&
-          FLIGHT.to.toLowerCase() === to.toLowerCase()
-      );
+          FLIGHT.to.toLowerCase() === to.toLowerCase() &&
+          timeDiffMinutes > 10 // RULE: Hide if less than 10 mins to boarding
+        );
+      });
       setsearchresult(results);
     } else if (bookingtype === "hotels") {
       const results = hotel.filter(
@@ -171,6 +180,7 @@ export default function Home() {
       router.push(`/book-hotel/${id}`);
     }
   };
+
   return (
     <div
       className="min-h-screen bg-cover bg-center bg-no-repeat"
@@ -180,6 +190,21 @@ export default function Home() {
       }}
     >
       <main className="container mx-auto px-4 py-6">
+
+        {user && user.bookings?.length > 0 && (
+          <div className="max-w-5xl mx-auto mb-6">
+            <h2 className="text-white text-xl font-bold mb-4">Your Live Trips</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {user.bookings
+                .filter((b: any) => b.type === "Flight")
+                .map((booking: any) => (
+                  <div key={booking.bookingId} className="bg-white rounded-xl p-4 shadow-lg">
+                    <LiveTracker flightId={booking.bookingId} />
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
         <nav className="bg-white rounded-xl shadow-lg mx-auto max-w-5xl mb-6 p-4 overflow-x-auto">
           <div className="flex justify-between items-center min-w-max space-x-8">
             <NavItem

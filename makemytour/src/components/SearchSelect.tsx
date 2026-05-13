@@ -50,12 +50,12 @@ export function SearchSelect({ options, placeholder, value, onChange, icon, subt
                 </div>
             </div>
             {isOpen && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg text-slate-900">
                     <ScrollArea className="h-64">
                         {filteredOptions.map((option: any) => (
                             <Button
                                 key={option.value}
-                                className="w-full justify-start font-normal"
+                                className="w-full justify-start font-normal text-slate-900 hover:text-slate-900 hover:bg-slate-100"
                                 variant="ghost"
                                 onClick={() => {
                                     onChange(option.value);
