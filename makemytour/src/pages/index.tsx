@@ -8,14 +8,11 @@ import { LiveTracker } from "@/components/Flights/LiveTracker";
 import {
   Bus,
   Calendar,
-  Car,
-  CreditCard,
   HomeIcon,
   Hotel,
   MapPin,
   Plane,
   QrCode,
-  Shield,
   Train,
   Umbrella,
   Users,
@@ -223,9 +220,6 @@ export default function Home() {
             <NavItem icon={<Umbrella />} text="Holiday" />
             <NavItem icon={<Train />} text="Trains" />
             <NavItem icon={<Bus />} text="Buses" />
-            <NavItem icon={<Car />} text="Cabs" />
-            <NavItem icon={<CreditCard />} text="Forex" />
-            <NavItem icon={<Shield />} text="Insurance" />
           </div>
         </nav>
 
