@@ -2,6 +2,7 @@ package com.makemytrip.makemytrip.services;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -31,48 +32,72 @@ public class FlightTrackingService {
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
         this.emitters.add(emitter);
         emitter.onCompletion(() -> this.emitters.remove(emitter));
+        emitter.onTimeout(() -> this.emitters.remove(emitter));
         return emitter;
     }
 
-    @Scheduled(fixedRate = 10000) // Ticks every 10 seconds
+    // SAFETY NET: Handles dates with or without times
+    private LocalDateTime parseSafeDate(String dateStr) {
+        if (dateStr == null || dateStr.trim().isEmpty()) {
+            return LocalDateTime.now().plusDays(1);
+        }
+        if (dateStr.contains("T")) {
+            return LocalDateTime.parse(dateStr);
+        } else {
+            return LocalDate.parse(dateStr).atStartOfDay();
+        }
+    }
+
+    @Scheduled(fixedRate = 10000)
     public void tick() {
+        if (emitters.isEmpty()) {
+            return;
+        }
+        System.out.println("Radar Tick: Pushing to " + emitters.size() + " clients.");
+
         List<Flight> allFlights = flightRepository.findAll();
         Map<String, FlightStatusUpdate> updates = new HashMap<>();
         LocalDateTime now = LocalDateTime.now();
 
         for (Flight f : allFlights) {
-            LocalDateTime dep = LocalDateTime.parse(f.getDepartureTime());
-            LocalDateTime arr = LocalDateTime.parse(f.getArrivalTime());
+            try {
+                LocalDateTime dep = parseSafeDate(f.getDepartureTime());
+                LocalDateTime arr = parseSafeDate(f.getArrivalTime());
 
-            String status;
-            int progress = 0;
-            String message = "On Time";
+                String status;
+                int progress = 0;
+                String message = "On Time";
 
-            // 1. Calculate Status based on System Clock
-            if (now.isBefore(dep.minusMinutes(10))) {
-                status = "SCHEDULED";
-                message = "Check-in Open";
-            } else if (now.isBefore(dep)) {
-                status = "BOARDING";
-                message = "Boarding at Gate 4";
-            } else if (now.isAfter(arr)) {
-                status = "LANDED";
-                progress = 100;
-                message = "Arrived Safely";
-            } else {
-                status = "IN_AIR";
-                // 2. Real-Time Progress Calculation
-                long total = Duration.between(dep, arr).toSeconds();
-                long elapsed = Duration.between(dep, now).toSeconds();
-                progress = (int) ((elapsed * 100) / total);
-                message = "En Route";
+                if (now.isBefore(dep.minusMinutes(10))) {
+                    status = "SCHEDULED";
+                    message = "Check-in Open";
+                } else if (now.isBefore(dep)) {
+                    status = "BOARDING";
+                    message = "Boarding at Gate 4";
+                } else if (now.isAfter(arr)) {
+                    status = "LANDED";
+                    progress = 100;
+                    message = "Arrived Safely";
+                } else {
+                    status = "IN_AIR";
+                    long total = Duration.between(dep, arr).toSeconds();
+                    long elapsed = Duration.between(dep, now).toSeconds();
+                    progress = total > 0 ? (int) ((elapsed * 100) / total) : 100;
+                    progress = Math.min(Math.max(progress, 0), 100);
+                    message = "En Route";
+                }
+
+                updates.put(f.getId(), new FlightStatusUpdate(
+                        f.getId(), status, message, customReasons.getOrDefault(f.getId(), "N/A"), progress
+                ));
+            } catch (Exception e) {
+                System.out.println("Format error on Flight " + f.getId());
             }
-
-            updates.put(f.getId(), new FlightStatusUpdate(
-                    f.getId(), status, message, customReasons.getOrDefault(f.getId(), "N/A"), progress
-            ));
         }
-        broadcast(updates);
+
+        if (!updates.isEmpty()) {
+            broadcast(updates);
+        }
     }
 
     private void broadcast(Object data) {

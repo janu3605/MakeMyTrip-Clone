@@ -70,7 +70,8 @@ export const getflight = async () => {
     const data = res.data;
     return data;
   } catch (error) {
-    // console.log(data);
+    console.error("Error fetching flights:", error.message);
+    throw error;
   }
 };
 

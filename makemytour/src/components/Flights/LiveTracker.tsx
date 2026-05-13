@@ -18,8 +18,7 @@ export const LiveTracker = ({ flightId }: { flightId: string }) => {
 
     useEffect(() => {
         setIsMounted(true);
-        // Connect to your live Render backend
-        const eventSource = new EventSource(`https://makemytrip-clone-7iaw.onrender.com/api/tracking/stream?flightId=${flightId}`);
+        const eventSource = new EventSource(`https://makemytrip-clone-7iaw.onrender.com/api/tracking/stream`);
 
         eventSource.addEventListener("flight-status", (event) => {
             const data = JSON.parse(event.data);
