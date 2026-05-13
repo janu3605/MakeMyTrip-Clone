@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import { clearUser, setUser } from "@/store";
 import { editprofile } from "@/api";
+import { LiveTracker } from "@/components/Flights/LiveTracker";
 const index = () => {
     const dispatch = useDispatch();
     const user = useSelector((state: any) => state.user.user);
@@ -258,6 +259,11 @@ const index = () => {
                                                 <span>Paid</span>
                                             </div>
                                         </div>
+
+                                        {/* Integration: Live tracker for each purchased flight */}
+                                        {booking?.type === "Flight" && (
+                                            <LiveTracker flightId={booking?.bookingId} />
+                                        )}
                                     </div>
                                 ))}
                             </div>

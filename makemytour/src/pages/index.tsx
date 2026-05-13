@@ -34,19 +34,7 @@ export default function Home() {
   const [flight, setflight] = useState<any[]>([]);
   const user = useSelector((state: any) => state.user.user);
   const router = useRouter();
-  const flightD = [
-    { id: 1, from: "Delhi", to: "Mumbai", date: "2025-01-15", price: 5000 },
-    { id: 2, from: "Mumbai", to: "Bengaluru", date: "2025-01-16", price: 4500 },
-    { id: 3, from: "Bengaluru", to: "Delhi", date: "2025-01-17", price: 5500 },
-    { id: 4, from: "Delhi", to: "Kolkata", date: "2025-01-18", price: 6000 },
-  ];
 
-  const hotelData = [
-    { id: 1, name: "Luxury Palace", city: "Mumbai", price: 15000 },
-    { id: 2, name: "Comfort Inn", city: "Delhi", price: 8000 },
-    { id: 3, name: "Seaside Resort", city: "Goa", price: 12000 },
-    { id: 4, name: "Mountain View Hotel", city: "Shimla", price: 10000 },
-  ];
   const offers = [
     {
       title: "Domestic Flights",
