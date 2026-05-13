@@ -178,6 +178,24 @@ export default function Home() {
     }
   };
 
+  const activeLiveTrips = user?.bookings
+    ?.filter((b: any) => b.type === "Flight")
+    .map((b: any) => {
+      // 1. Cross-reference the booking ID with the actual flight details database
+      const flightDetails = flight.find((f: any) => (f.id === b.bookingId || f._id === b.bookingId));
+      return { ...b, flightDetails };
+    })
+    .filter((trip: any) => {
+      if (!trip.flightDetails) return false; // Hide if flight was deleted from DB
+
+      const arrTime = new Date(trip.flightDetails.arrivalTime);
+      const now = new Date();
+
+      // 2. Hide "Timed Out" flights: Only show if the arrival time is in the future 
+      // (or it landed less than 30 minutes ago)
+      return arrTime.getTime() > now.getTime() - (30 * 60 * 1000);
+    });
+
   return (
     <div
       className="min-h-screen bg-cover bg-center bg-no-repeat"
@@ -187,18 +205,34 @@ export default function Home() {
       }}
     >
       <main className="container mx-auto px-4 py-6">
+        {user && activeLiveTrips?.length > 0 && (
+          <div className="max-w-5xl mx-auto mb-6 relative z-10">
+            <h2 className="text-white text-xl font-bold mb-4 drop-shadow-md">Your Active Live Trips</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {activeLiveTrips.map((trip: any) => (
+                <div key={trip.bookingId} className="bg-white/95 backdrop-blur rounded-xl p-4 shadow-xl border border-gray-100">
 
-        {user && user.bookings?.length > 0 && (
-          <div className="max-w-5xl mx-auto mb-6">
-            <h2 className="text-white text-xl font-bold mb-4">Your Live Trips</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {user.bookings
-                .filter((b: any) => b.type === "Flight")
-                .map((booking: any) => (
-                  <div key={booking.bookingId} className="bg-white rounded-xl p-4 shadow-lg">
-                    <LiveTracker flightId={booking.bookingId} />
+                  {/* NEW: Flight Details Header */}
+                  <div className="flex justify-between items-start mb-2 pb-3 border-b border-gray-100">
+                    <div>
+                      <h3 className="font-bold text-blue-900">{trip.flightDetails.flightName}</h3>
+                      <p className="text-xs font-medium text-gray-600 mt-1 flex items-center gap-1">
+                        {trip.flightDetails.from}
+                        <span className="text-gray-400 text-[10px]">✈</span>
+                        {trip.flightDetails.to}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-bold text-gray-800">
+                        {new Date(trip.flightDetails.departureTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                      <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Departure</p>
+                    </div>
                   </div>
-                ))}
+
+                  <LiveTracker flightId={trip.bookingId} />
+                </div>
+              ))}
             </div>
           </div>
         )}
