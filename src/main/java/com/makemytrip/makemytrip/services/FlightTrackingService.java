@@ -36,16 +36,31 @@ public class FlightTrackingService {
         return emitter;
     }
 
-    // SAFETY NET: Handles dates with or without times
     private LocalDateTime parseSafeDate(String dateStr) {
         if (dateStr == null || dateStr.trim().isEmpty()) {
             return LocalDateTime.now().plusDays(1);
         }
-        if (dateStr.contains("T")) {
-            return LocalDateTime.parse(dateStr);
-        } else {
-            return LocalDate.parse(dateStr).atStartOfDay();
+        try {
+            dateStr = dateStr.trim();
+            if (dateStr.contains("T")) {
+                return LocalDateTime.parse(dateStr);
+            }
+            if (dateStr.contains("-") && !dateStr.contains(":")) {
+                return LocalDate.parse(dateStr).atStartOfDay();
+            }
+            if (dateStr.contains("-") && dateStr.contains(":")) {
+                return LocalDateTime.parse(dateStr.replace(" ", "T"));
+            }
+            if (dateStr.contains(":")) {
+                String[] parts = dateStr.split(":");
+                int h = Integer.parseInt(parts[0].trim());
+                int m = Integer.parseInt(parts[1].trim());
+                return LocalDateTime.now().withHour(h).withMinute(m).withSecond(0);
+            }
+        } catch (Exception e) {
+            System.out.println("Could not parse date: " + dateStr);
         }
+        return LocalDateTime.now().plusDays(1); 
     }
 
     @Scheduled(fixedRate = 10000)

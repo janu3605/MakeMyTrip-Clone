@@ -178,22 +178,45 @@ export default function Home() {
     }
   };
 
+  const formatTime = (timeStr: string) => {
+    if (!timeStr) return "N/A";
+    try {
+      if (timeStr.includes("T") || timeStr.includes("-")) {
+        return new Date(timeStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+      if (timeStr.includes(":")) {
+        const [h, m] = timeStr.split(':');
+        const hour = parseInt(h);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        return `${hour % 12 || 12}:${m} ${ampm}`;
+      }
+    } catch (e) { }
+    return timeStr;
+  };
+
   const activeLiveTrips = user?.bookings
     ?.filter((b: any) => b.type === "Flight")
     .map((b: any) => {
-      // 1. Cross-reference the booking ID with the actual flight details database
       const flightDetails = flight.find((f: any) => (f.id === b.bookingId || f._id === b.bookingId));
       return { ...b, flightDetails };
     })
     .filter((trip: any) => {
-      if (!trip.flightDetails) return false; // Hide if flight was deleted from DB
+      if (!trip.flightDetails) return false;
 
-      const arrTime = new Date(trip.flightDetails.arrivalTime);
+      let arrStr = trip.flightDetails.arrivalTime;
+      let arrTime = new Date();
+
+      if (arrStr) {
+        if (arrStr.includes("T") || arrStr.includes("-")) {
+          arrTime = new Date(arrStr);
+        } else if (arrStr.includes(":")) {
+          const [h, m] = arrStr.split(':');
+          arrTime.setHours(parseInt(h), parseInt(m), 0, 0);
+        }
+      }
+
       const now = new Date();
-
-      // 2. Hide "Timed Out" flights: Only show if the arrival time is in the future 
-      // (or it landed less than 30 minutes ago)
-      return arrTime.getTime() > now.getTime() - (30 * 60 * 1000);
+      return arrTime.getTime() > now.getTime() - (2 * 60 * 60 * 1000);
     });
 
   return (
@@ -205,6 +228,7 @@ export default function Home() {
       }}
     >
       <main className="container mx-auto px-4 py-6">
+        {/* DASHBOARD WIDGET */}
         {user && activeLiveTrips?.length > 0 && (
           <div className="max-w-5xl mx-auto mb-6 relative z-10">
             <h2 className="text-white text-xl font-bold mb-4 drop-shadow-md">Your Active Live Trips</h2>
@@ -212,7 +236,6 @@ export default function Home() {
               {activeLiveTrips.map((trip: any) => (
                 <div key={trip.bookingId} className="bg-white/95 backdrop-blur rounded-xl p-4 shadow-xl border border-gray-100">
 
-                  {/* NEW: Flight Details Header */}
                   <div className="flex justify-between items-start mb-2 pb-3 border-b border-gray-100">
                     <div>
                       <h3 className="font-bold text-blue-900">{trip.flightDetails.flightName}</h3>
@@ -224,7 +247,7 @@ export default function Home() {
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-bold text-gray-800">
-                        {new Date(trip.flightDetails.departureTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {formatTime(trip.flightDetails.departureTime)}
                       </p>
                       <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Departure</p>
                     </div>
