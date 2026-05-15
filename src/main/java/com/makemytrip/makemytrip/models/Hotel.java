@@ -11,6 +11,7 @@ public class Hotel {
     private String hotelName;
     private String location;
     private double pricePerNight;
+    private double basePricePerNight;
     private int availableRooms;
     private String amenities;
 
@@ -61,5 +62,13 @@ public class Hotel {
 
     public void setPricePerNight(double pricePerNight) {
         this.pricePerNight = pricePerNight;
+    }
+
+    public double getBasePricePerNight() {
+        return basePricePerNight;
+    }
+
+    public void setBasePricePerNight(double basePricePerNight) {
+        this.basePricePerNight = basePricePerNight;
     }
 }

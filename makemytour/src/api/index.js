@@ -204,3 +204,77 @@ export const handlehotelbooking = async (userId, hotelId, rooms, price) => {
     console.log(error);
   }
 };
+
+// ========== DYNAMIC PRICING APIs ==========
+
+export const getPriceHistory = async (entityId, entityType) => {
+  try {
+    const res = await axios.get(
+      `${BACKEND_URL}/api/pricing/history?entityId=${entityId}&entityType=${entityType}`
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching price history:", error.message);
+    return [];
+  }
+};
+
+export const createPriceFreeze = async (userId, entityId, entityType, quantity) => {
+  try {
+    const url = `${BACKEND_URL}/api/pricing/freeze?userId=${userId}&entityId=${entityId}&entityType=${entityType}&quantity=${quantity}`;
+    const res = await axios.post(url);
+    return res.data;
+  } catch (error) {
+    console.error("Error creating price freeze:", error.message);
+    throw error;
+  }
+};
+
+export const checkPriceFreeze = async (userId, entityId) => {
+  try {
+    const res = await axios.get(
+      `${BACKEND_URL}/api/pricing/freeze/check?userId=${userId}&entityId=${entityId}`
+    );
+    return res.data;
+  } catch (error) {
+    // 404 means no active freeze — not an error
+    return null;
+  }
+};
+
+export const getFreezeFee = async (quantity) => {
+  try {
+    const res = await axios.get(
+      `${BACKEND_URL}/api/pricing/freeze/fee?quantity=${quantity}`
+    );
+    return res.data;
+  } catch (error) {
+    return 99; // fallback
+  }
+};
+
+export const getSeasonalRules = async () => {
+  try {
+    const res = await axios.get(`${BACKEND_URL}/api/pricing/rules`);
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching seasonal rules:", error.message);
+    return [];
+  }
+};
+
+export const addSeasonalRule = async (name, startDate, endDate, multiplier) => {
+  try {
+    const res = await axios.post(`${BACKEND_URL}/api/pricing/rules`, {
+      name,
+      startDate,
+      endDate,
+      multiplier,
+      active: true,
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error adding seasonal rule:", error.message);
+    throw error;
+  }
+};

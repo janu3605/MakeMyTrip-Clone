@@ -28,6 +28,8 @@ import {
     editflight,
     edithotel,
     getuserbyemail,
+    getSeasonalRules,
+    addSeasonalRule,
 } from "@/api";
 import HotelList from "@/components/Hotel/Hotel";
 const mockFlights = [
@@ -446,6 +448,157 @@ function AddEditFlight({ flight }: { flight: Flight | null }) {
     );
 }
 
+function SeasonalRulesManager() {
+    const [rules, setRules] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [formData, setFormData] = useState({
+        name: "",
+        startDate: "",
+        endDate: "",
+        multiplier: 1.2,
+    });
+
+    useEffect(() => {
+        const fetch = async () => {
+            const data = await getSeasonalRules();
+            setRules(data);
+            setLoading(false);
+        };
+        fetch();
+    }, []);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const newRule = await addSeasonalRule(
+                formData.name,
+                formData.startDate,
+                formData.endDate,
+                formData.multiplier
+            );
+            setRules([...rules, newRule]);
+            setFormData({ name: "", startDate: "", endDate: "", multiplier: 1.2 });
+        } catch (error) {
+            console.error("Failed to add rule", error);
+        }
+    };
+
+    const isActive = (startDate: string, endDate: string) => {
+        const today = new Date().toISOString().split("T")[0];
+        return today >= startDate && today <= endDate;
+    };
+
+    return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Rules Table */}
+            <div>
+                <h3 className="text-lg font-semibold mb-4">Active Seasonal Rules</h3>
+                {loading ? (
+                    <p className="text-gray-500">Loading rules...</p>
+                ) : rules.length === 0 ? (
+                    <p className="text-gray-500">No seasonal rules configured yet.</p>
+                ) : (
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Name</TableHead>
+                                <TableHead>Dates</TableHead>
+                                <TableHead>Multiplier</TableHead>
+                                <TableHead>Status</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {rules.map((rule: any) => (
+                                <TableRow key={rule.id || rule._id}>
+                                    <TableCell className="font-medium">{rule.name}</TableCell>
+                                    <TableCell className="text-sm text-gray-600">
+                                        {rule.startDate} → {rule.endDate}
+                                    </TableCell>
+                                    <TableCell>
+                                        <span className="font-semibold text-orange-600">
+                                            {rule.multiplier}x
+                                        </span>
+                                        <span className="text-xs text-gray-500 ml-1">
+                                            (+{Math.round((rule.multiplier - 1) * 100)}%)
+                                        </span>
+                                    </TableCell>
+                                    <TableCell>
+                                        {isActive(rule.startDate, rule.endDate) ? (
+                                            <span className="px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                                                Active Now
+                                            </span>
+                                        ) : (
+                                            <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
+                                                Scheduled
+                                            </span>
+                                        )}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                )}
+            </div>
+
+            {/* Add Rule Form */}
+            <div>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <h3 className="text-lg font-semibold mb-2">Add New Seasonal Rule</h3>
+                    <div>
+                        <Label htmlFor="ruleName">Rule Name</Label>
+                        <Input
+                            id="ruleName"
+                            placeholder="e.g. Diwali Peak Season"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <Label htmlFor="ruleStart">Start Date</Label>
+                        <Input
+                            id="ruleStart"
+                            type="date"
+                            value={formData.startDate}
+                            onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <Label htmlFor="ruleEnd">End Date</Label>
+                        <Input
+                            id="ruleEnd"
+                            type="date"
+                            value={formData.endDate}
+                            onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <Label htmlFor="ruleMultiplier">Price Multiplier</Label>
+                        <Input
+                            id="ruleMultiplier"
+                            type="number"
+                            step="0.05"
+                            min="1.0"
+                            max="3.0"
+                            value={formData.multiplier}
+                            onChange={(e) =>
+                                setFormData({ ...formData, multiplier: parseFloat(e.target.value) || 1.0 })
+                            }
+                            required
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                            1.20 = 20% price increase during this period
+                        </p>
+                    </div>
+                    <Button type="submit">Add Seasonal Rule</Button>
+                </form>
+            </div>
+        </div>
+    );
+}
+
 export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState("flights");
     const [selectedFlight, setSelectedFlight] = useState(null);
@@ -455,10 +608,11 @@ export default function AdminDashboard() {
         <div className="container mx-auto p-4 bg-white max-w-full">
             <h1 className="text-3xl font-bold mb-6 ">Admin Dashboard</h1>
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-3  text-black">
+                <TabsList className="grid w-full grid-cols-4  text-black">
                     <TabsTrigger value="flights">Flights</TabsTrigger>
                     <TabsTrigger value="hotels">Hotels</TabsTrigger>
                     <TabsTrigger value="users">Users</TabsTrigger>
+                    <TabsTrigger value="pricing">Pricing</TabsTrigger>
                 </TabsList>
                 <TabsContent value="flights">
                     <Card>
@@ -500,6 +654,21 @@ export default function AdminDashboard() {
                         </CardHeader>
                         <CardContent>
                             <UserSearch />
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+                <TabsContent value="pricing">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Dynamic Pricing</CardTitle>
+                            <CardDescription>
+                                Configure seasonal pricing rules. The pricing engine applies these
+                                multipliers automatically to all flights and hotels during the specified
+                                date ranges.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <SeasonalRulesManager />
                         </CardContent>
                     </Card>
                 </TabsContent>

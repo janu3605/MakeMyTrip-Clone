@@ -1,4 +1,6 @@
 import { useRouter } from "next/router";
+import { PriceHistoryChart } from "@/components/Pricing/PriceHistoryChart";
+import { PriceFreezeButton } from "@/components/Pricing/PriceFreezeButton";
 import {
     Star,
     MapPin,
@@ -341,6 +343,14 @@ const BookHotelPage = () => {
                                 <button className="text-blue-500">+ 31 Amenities</button>
                             </div>
                         </div>
+
+                        {/* Price History Chart */}
+                        <PriceHistoryChart
+                            entityId={hotel.id}
+                            entityType="HOTEL"
+                            currentPrice={hotel.pricePerNight}
+                            basePrice={hotel.pricePerNight}
+                        />
                     </div>
 
                     {/* Booking Card */}
@@ -402,6 +412,15 @@ const BookHotelPage = () => {
                                     </span>
                                 </div>
                             </div>
+
+                            {/* Price Freeze */}
+                            <PriceFreezeButton
+                                entityId={hotel.id}
+                                entityType="HOTEL"
+                                currentPrice={hotel.pricePerNight}
+                                quantity={quantity}
+                            />
+
                             <Dialog open={open} onOpenChange={setopem}>
                                 <DialogTrigger>
                                     <button className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors mb-3">

@@ -5,6 +5,7 @@ import SignupDialog from "@/components/SignupDialog";
 import { Button } from "@/components/ui/button";
 import { useGlobalFlightTracking } from "@/hooks/useGlobalFlightTracking";
 import { LiveTracker } from "@/components/Flights/LiveTracker";
+import { PriceBadge } from "@/components/Pricing/PriceBadge";
 import {
   Bus,
   Calendar,
@@ -368,6 +369,14 @@ export default function Home() {
                         <p className="text-lg font-bold mt-2">
                           ₹{result.price}
                         </p>
+                        {result.basePrice > 0 && result.basePrice !== result.price && (
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-sm text-gray-400 line-through">
+                              ₹{result.basePrice}
+                            </span>
+                            <PriceBadge currentPrice={result.price} basePrice={result.basePrice} />
+                          </div>
+                        )}
                         <Button
                           className="w-full mt-4"
                           onClick={() => handlebooknow(result.id)}
@@ -384,6 +393,14 @@ export default function Home() {
                         <p className="text-lg font-bold mt-2">
                           ₹{result.pricePerNight} per night
                         </p>
+                        {result.basePricePerNight > 0 && result.basePricePerNight !== result.pricePerNight && (
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-sm text-gray-400 line-through">
+                              ₹{result.basePricePerNight}
+                            </span>
+                            <PriceBadge currentPrice={result.pricePerNight} basePrice={result.basePricePerNight} />
+                          </div>
+                        )}
                         <Button
                           className="w-full mt-4"
                           onClick={() => handlebooknow(result.id)}

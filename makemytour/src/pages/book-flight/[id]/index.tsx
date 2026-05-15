@@ -1,4 +1,6 @@
 import { useRouter } from "next/router";
+import { PriceHistoryChart } from "@/components/Pricing/PriceHistoryChart";
+import { PriceFreezeButton } from "@/components/Pricing/PriceFreezeButton";
 
 import {
     Plane,
@@ -396,6 +398,14 @@ const BookFlightPage = () => {
                             </div>
                         </div>
 
+                        {/* Price History Chart */}
+                        <PriceHistoryChart
+                            entityId={flight.id}
+                            entityType="FLIGHT"
+                            currentPrice={flight.price}
+                            basePrice={flight.basePrice || flight.price}
+                        />
+
                         {/* Cancellation Policy */}
                         <div className="bg-white rounded-xl shadow-sm p-6">
                             <div className="flex justify-between items-center mb-6">
@@ -524,9 +534,18 @@ const BookFlightPage = () => {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Price Freeze */}
+                            <PriceFreezeButton
+                                entityId={flight.id}
+                                entityType="FLIGHT"
+                                currentPrice={flight.price}
+                                quantity={quantity}
+                            />
+
                             <Dialog open={open} onOpenChange={setopem}>
                                 <DialogTrigger>
-                                    <Button className="w-full bg-red-600 text-white">
+                                    <Button className="w-full bg-red-600 text-white mt-4">
                                         Book Now
                                     </Button>
                                 </DialogTrigger>

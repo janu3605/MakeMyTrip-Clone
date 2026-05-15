@@ -14,6 +14,7 @@ public class Flight {
     private String departureTime;
     private String arrivalTime;
     private double price;
+    private double basePrice;
     private int availableSeats;
 
     // Getters and Setters
@@ -79,5 +80,13 @@ public class Flight {
 
     public void setAvailableSeats(int availableSeats) {
         this.availableSeats = availableSeats;
+    }
+
+    public double getBasePrice() {
+        return basePrice;
+    }
+
+    public void setBasePrice(double basePrice) {
+        this.basePrice = basePrice;
     }
 }
