@@ -71,7 +71,7 @@ export const LiveTracker = ({ flightId }: { flightId: string }) => {
             </div>
 
             <div className="space-y-2">
-                <div className="flex justify-between text-xs text-gray-500">
+                <div className="flex justify-between text-xs text-gray-900">
                     <span>{status.message}</span>
                     <span>{status.progress}%</span>
                 </div>

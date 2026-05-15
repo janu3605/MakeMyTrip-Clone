@@ -244,7 +244,7 @@ export default function Home() {
                   <div className="flex justify-between items-start mb-2 pb-3 border-b border-gray-100">
                     <div>
                       <h3 className="font-bold text-blue-900">{trip.flightDetails.flightName}</h3>
-                      <p className="text-xs font-medium text-gray-600 mt-1 flex items-center gap-1">
+                      <p className="text-xs font-medium text-black mt-1 flex items-center gap-1">
                         {trip.flightDetails.from}
                         <span className="text-gray-400 text-[10px]">✈</span>
                         {trip.flightDetails.to}
@@ -254,7 +254,7 @@ export default function Home() {
                       <p className="text-sm font-bold text-gray-800">
                         {formatTime(trip.flightDetails.departureTime)}
                       </p>
-                      <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Departure</p>
+                      <p className="text-[10px] text-gray-900 uppercase tracking-wider font-semibold">Departure</p>
                     </div>
                   </div>
 
@@ -422,10 +422,10 @@ export default function Home() {
                         <h3 className="font-semibold text-lg">
                           {result.from} to {result.to}
                         </h3>
-                        <p className="text-gray-600">
+                        <p className="text-black">
                           Departure Time: {formatDate(result.departureTime)}
                         </p>
-                        <p className="text-gray-600">
+                        <p className="text-black">
                           Arrival Time: {formatDate(result.arrivalTime)}
                         </p>
                         <p className="text-lg font-bold mt-2">
@@ -451,7 +451,7 @@ export default function Home() {
                         <h3 className="font-semibold text-lg">
                           {result.hotelName}
                         </h3>
-                        <p className="text-gray-600">City: {result.location}</p>
+                        <p className="text-black">City: {result.location}</p>
                         <p className="text-lg font-bold mt-2">
                           ₹{result.pricePerNight} per night
                         </p>
@@ -475,7 +475,7 @@ export default function Home() {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-600">
+              <p className="text-black">
                 No {bookingtype} available for the selected criteria.
               </p>
             )}
@@ -533,7 +533,7 @@ const OfferCard = ({ title, description, imageUrl }: any) => {
       <img src={imageUrl} alt={title} className="w-full h-48 object-cover" />
       <div className="p-4">
         <h3 className="font-semibold text-lg mb-2">{title}</h3>
-        <p className="text-gray-600 text-sm">{description}</p>
+        <p className="text-black text-sm">{description}</p>
         <button className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
           Book Now
         </button>
@@ -569,7 +569,7 @@ const DownloadApp = () => {
       <div className="flex flex-col md:flex-row items-center justify-between">
         <div className="mb-6 md:mb-0">
           <h3 className="text-xl font-bold mb-2">Download App Now!</h3>
-          <p className="text-gray-600 mb-4">
+          <p className="text-black mb-4">
             Get India's #1 travel super app with best deals on flights
           </p>
           <div className="flex space-x-4">
@@ -587,7 +587,7 @@ const DownloadApp = () => {
         </div>
         <div className="flex items-center space-x-4">
           <QrCode className="w-24 h-24" />
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-black">
             Scan QR code to download the app
           </p>
         </div>
@@ -615,7 +615,7 @@ const WonderCard = ({ title, imageUrl }: any) => {
 function NavItem({ icon, text, active = false, onClick }: any) {
   return (
     <button
-      className={`flex flex-col items-center p-2 rounded-lg transition-colors ${active ? "text-blue-500" : "text-gray-600 hover:text-blue-500"
+      className={`flex flex-col items-center p-2 rounded-lg transition-colors ${active ? "text-blue-500" : "text-black hover:text-blue-500"
         }`}
       onClick={onClick}
     >
@@ -638,7 +638,7 @@ function SearchInput({
       <div className="flex items-center space-x-2">
         {icon}
         <div className="flex-1 min-w-0">
-          <div className="text-sm text-gray-500 truncate">{placeholder}</div>
+          <div className="text-sm text-gray-900 truncate">{placeholder}</div>
           <input
             type={type}
             value={value}

@@ -210,13 +210,13 @@ const BookHotelPage = () => {
                     </h3>
                     <div className="space-y-2">
                         <div className="flex justify-between items-center">
-                            <span className="text-gray-600">Base Fare</span>
+                            <span className="text-black">Base Fare</span>
                             <span className="font-medium">
                                 ₹ {totalPrice.toLocaleString()}
                             </span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-gray-600">Taxes and Extracharges</span>
+                            <span className="text-black">Taxes and Extracharges</span>
                             <span className="font-medium">
                                 ₹ {totalTaxes.toLocaleString()}
                             </span>
@@ -255,7 +255,7 @@ const BookHotelPage = () => {
                             {hotel?.location}
                         </a>
                         <ChevronRight className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-600">{hotel?.hotelName}</span>
+                        <span className="text-black">{hotel?.hotelName}</span>
                     </div>
                 </div>
             </div>
@@ -322,7 +322,7 @@ const BookHotelPage = () => {
                         </div>
 
                         {/* Description */}
-                        <p className="text-gray-600 mb-6">
+                        <p className="text-black mb-6">
                             {hotelData.description}
                             <button className="text-blue-500 ml-2">Read more</button>
                         </p>
@@ -334,7 +334,7 @@ const BookHotelPage = () => {
                                 {hotelData.amenities.map((amenity, index) => (
                                     <div
                                         key={index}
-                                        className="flex items-center space-x-2 text-gray-600"
+                                        className="flex items-center space-x-2 text-black"
                                     >
                                         {amenity.icon}
                                         <span>{amenity.name}</span>
@@ -359,13 +359,13 @@ const BookHotelPage = () => {
                             <h3 className="text-xl font-semibold mb-4">
                                 {hotelData.room.type}
                             </h3>
-                            <p className="text-gray-600 mb-4">{hotelData.room.capacity}</p>
+                            <p className="text-black mb-4">{hotelData.room.capacity}</p>
 
                             <ul className="space-y-3 mb-6">
                                 {hotelData.room.features.map((feature, index) => (
                                     <li key={index} className="flex items-start space-x-2">
                                         <span className="text-gray-400">•</span>
-                                        <span className="text-gray-600">{feature}</span>
+                                        <span className="text-black">{feature}</span>
                                     </li>
                                 ))}
                             </ul>
@@ -395,19 +395,19 @@ const BookHotelPage = () => {
                                     <h4 className="text-gray-800 font-semibold mb-2">
                                         Amenities:
                                     </h4>
-                                    <p className="text-gray-600">{hotel.amenities}</p>
+                                    <p className="text-black">{hotel.amenities}</p>
                                 </div>
                             </div>
                             <div className="space-y-2 mb-6">
                                 <div className="flex items-center justify-between">
-                                    <span className="text-gray-500 line-through">
+                                    <span className="text-gray-900 line-through">
                                         ₹ {totalPrice}
                                     </span>
-                                    <span className="text-gray-500">Per Night:</span>
+                                    <span className="text-gray-900">Per Night:</span>
                                 </div>
                                 <div className="flex items-center justify-between text-2xl font-bold">
                                     <span>₹ {grandTotal}</span>
-                                    <span className="text-sm text-gray-500 font-normal">
+                                    <span className="text-sm text-gray-900 font-normal">
                                         + ₹ {totalTaxes} taxes & fees
                                     </span>
                                 </div>
@@ -456,7 +456,7 @@ const BookHotelPage = () => {
                                         <div className="font-semibold text-lg">
                                             {hotelData.reviews.text}
                                         </div>
-                                        <div className="text-gray-500">
+                                        <div className="text-gray-900">
                                             ({hotelData.reviews.count} ratings)
                                         </div>
                                     </div>

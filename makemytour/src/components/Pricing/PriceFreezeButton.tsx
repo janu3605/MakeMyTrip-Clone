@@ -165,7 +165,7 @@ export const PriceFreezeButton = ({ entityId, entityType, currentPrice, quantity
         )}
         {loading ? "Freezing..." : `Freeze This Price for ₹${fee}`}
       </button>
-      <p className="text-[11px] text-gray-500 text-center mt-2">
+      <p className="text-[11px] text-gray-900 text-center mt-2">
         Lock ₹{currentPrice.toLocaleString("en-IN")} for 24 hours • Non-refundable fee
       </p>
     </div>

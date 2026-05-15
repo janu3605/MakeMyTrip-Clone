@@ -263,19 +263,19 @@ const BookFlightPage = () => {
                     </h3>
                     <div className="space-y-2">
                         <div className="flex justify-between items-center">
-                            <span className="text-gray-600">Base Fare</span>
+                            <span className="text-black">Base Fare</span>
                             <span className="font-medium">
                                 ₹ {totalPrice.toLocaleString()}
                             </span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-gray-600">Taxes and Surcharges</span>
+                            <span className="text-black">Taxes and Surcharges</span>
                             <span className="font-medium">
                                 ₹ {totalTaxes.toLocaleString()}
                             </span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-gray-600">Other Services</span>
+                            <span className="text-black">Other Services</span>
                             <span className="font-medium">
                                 ₹ {totalOtherServices.toLocaleString()}
                             </span>
@@ -322,7 +322,7 @@ const BookFlightPage = () => {
                                             CANCELLATION FEES APPLY
                                         </span>
                                     </div>
-                                    <div className="flex items-center text-sm text-gray-600">
+                                    <div className="flex items-center text-sm text-black">
                                         <Calendar className="w-4 h-4 mr-2" />
                                         <span>{formatDate(flight.departureTime)}</span>
                                         <span className="mx-2">•</span>
@@ -342,7 +342,7 @@ const BookFlightPage = () => {
                                 </div>
                                 <div>
                                     <div className="font-semibold">{flight.flightName}</div>
-                                    <div className="text-sm text-gray-600">
+                                    <div className="text-sm text-black">
                                         {flightDetails.flightNo} • {flightDetails.aircraft}
                                     </div>
                                 </div>
@@ -350,7 +350,7 @@ const BookFlightPage = () => {
                                     <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full">
                                         Economy
                                     </span>
-                                    <span className="ml-2 text-gray-600">MMTSPECIAL</span>
+                                    <span className="ml-2 text-black">MMTSPECIAL</span>
                                 </div>
                             </div>
 
@@ -359,40 +359,40 @@ const BookFlightPage = () => {
                                     <div className="text-2xl font-bold">
                                         {formatDate(flight.departureTime)}
                                     </div>
-                                    <div className="text-sm text-gray-600 mt-1 flex items-start">
+                                    <div className="text-sm text-black mt-1 flex items-start">
                                         <MapPin className="w-4 h-4 mr-1 flex-shrink-0 mt-0.5" />
                                         {flight.from} International Airport, Terminal T2
                                     </div>
                                 </div>
                                 <div className="text-center flex-shrink-0">
-                                    <div className="text-sm text-gray-600 mb-1">
+                                    <div className="text-sm text-black mb-1">
                                         {flightDetails.duration}
                                     </div>
                                     <div className="w-32 h-0.5 bg-gray-300 relative my-2">
                                         <div className="absolute -top-2 right-0 w-4 h-4 rounded-full bg-gray-300 flex items-center justify-center">
-                                            <Plane className="w-3 h-3 text-gray-600" />
+                                            <Plane className="w-3 h-3 text-black" />
                                         </div>
                                     </div>
-                                    <div className="text-xs text-gray-500">Non-stop</div>
+                                    <div className="text-xs text-gray-900">Non-stop</div>
                                 </div>
                                 <div className="text-right">
                                     <div className="text-2xl font-bold">
                                         {formatDate(flight.arrivalTime)}
                                     </div>
-                                    <div className="text-sm text-gray-600 mt-1 flex items-start justify-end">
+                                    <div className="text-sm text-black mt-1 flex items-start justify-end">
                                         <MapPin className="w-4 h-4 mr-1 flex-shrink-0 mt-0.5" />
                                         {flight.to} International Airport, Terminal T3
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="flex flex-wrap gap-6 mt-6 text-sm text-gray-600">
+                            <div className="flex flex-wrap gap-6 mt-6 text-sm text-black">
                                 <div className="flex items-center">
-                                    <Luggage className="w-5 h-5 mr-2 text-gray-500" />
+                                    <Luggage className="w-5 h-5 mr-2 text-gray-900" />
                                     <span>Cabin Baggage: {flightDetails.cabinBaggage}</span>
                                 </div>
                                 <div className="flex items-center">
-                                    <Luggage className="w-5 h-5 mr-2 text-gray-500" />
+                                    <Luggage className="w-5 h-5 mr-2 text-gray-900" />
                                     <span>Check-in Baggage: {flightDetails.checkInBaggage}</span>
                                 </div>
                             </div>
@@ -428,7 +428,7 @@ const BookFlightPage = () => {
                                     <div className="font-bold text-lg">₹ 4,300</div>
                                 </div>
                                 <div className="h-2.5 bg-gradient-to-r from-green-500 via-yellow-500 to-red-500 rounded-full"></div>
-                                <div className="flex justify-between mt-2 text-xs text-gray-600">
+                                <div className="flex justify-between mt-2 text-xs text-black">
                                     <span>Now</span>
                                     <span>16 Jan, 15:55</span>
                                     <span>16 Jan, 17:55</span>
@@ -467,7 +467,7 @@ const BookFlightPage = () => {
                                             <h3 className="font-semibold text-lg mb-1">
                                                 {hotel.name}
                                             </h3>
-                                            <div className="flex items-center text-sm text-gray-600 mb-2">
+                                            <div className="flex items-center text-sm text-black mb-2">
                                                 <MapPin className="w-4 h-4 mr-1" />
                                                 {hotel.location}
                                             </div>
@@ -478,7 +478,7 @@ const BookFlightPage = () => {
                                                     ))}
                                                 </div>
                                                 <div className="text-right">
-                                                    <div className="text-xs text-gray-500">
+                                                    <div className="text-xs text-gray-900">
                                                         Starting from
                                                     </div>
                                                     <div className="font-bold text-lg">
@@ -497,24 +497,24 @@ const BookFlightPage = () => {
                     <div className="lg:col-span-1">
                         <div className="bg-white rounded-xl shadow-sm p-6 sticky top-24">
                             <h2 className="text-lg font-bold mb-6 flex items-center">
-                                <CreditCard className="w-5 h-5 mr-2 text-gray-600" />
+                                <CreditCard className="w-5 h-5 mr-2 text-black" />
                                 Fare Summary
                             </h2>
                             <div className="space-y-2">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-gray-600">Base Fare</span>
+                                    <span className="text-black">Base Fare</span>
                                     <span className="font-medium">
                                         ₹ {totalPrice.toLocaleString()}
                                     </span>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span className="text-gray-600">Taxes and Surcharges</span>
+                                    <span className="text-black">Taxes and Surcharges</span>
                                     <span className="font-medium">
                                         ₹ {totalTaxes.toLocaleString()}
                                     </span>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span className="text-gray-600">Other Services</span>
+                                    <span className="text-black">Other Services</span>
                                     <span className="font-medium">
                                         ₹ {totalOtherServices.toLocaleString()}
                                     </span>
@@ -590,7 +590,7 @@ const BookFlightPage = () => {
                                                     <div className="font-semibold text-red-600">
                                                         {offer.code}
                                                     </div>
-                                                    <p className="text-sm text-gray-600 mt-1">
+                                                    <p className="text-sm text-black mt-1">
                                                         {offer.description}
                                                     </p>
                                                     <button className="text-blue-600 text-sm font-medium mt-2 hover:text-blue-700">

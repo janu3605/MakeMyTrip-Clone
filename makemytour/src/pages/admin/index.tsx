@@ -494,9 +494,9 @@ function SeasonalRulesManager() {
             <div>
                 <h3 className="text-lg font-semibold mb-4">Active Seasonal Rules</h3>
                 {loading ? (
-                    <p className="text-gray-500">Loading rules...</p>
+                    <p className="text-gray-900">Loading rules...</p>
                 ) : rules.length === 0 ? (
-                    <p className="text-gray-500">No seasonal rules configured yet.</p>
+                    <p className="text-gray-900">No seasonal rules configured yet.</p>
                 ) : (
                     <Table>
                         <TableHeader>
@@ -511,14 +511,14 @@ function SeasonalRulesManager() {
                             {rules.map((rule: any) => (
                                 <TableRow key={rule.id || rule._id}>
                                     <TableCell className="font-medium">{rule.name}</TableCell>
-                                    <TableCell className="text-sm text-gray-600">
+                                    <TableCell className="text-sm text-black">
                                         {rule.startDate} → {rule.endDate}
                                     </TableCell>
                                     <TableCell>
                                         <span className="font-semibold text-orange-600">
                                             {rule.multiplier}x
                                         </span>
-                                        <span className="text-xs text-gray-500 ml-1">
+                                        <span className="text-xs text-gray-900 ml-1">
                                             (+{Math.round((rule.multiplier - 1) * 100)}%)
                                         </span>
                                     </TableCell>
@@ -528,7 +528,7 @@ function SeasonalRulesManager() {
                                                 Active Now
                                             </span>
                                         ) : (
-                                            <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
+                                            <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-black">
                                                 Scheduled
                                             </span>
                                         )}
@@ -588,7 +588,7 @@ function SeasonalRulesManager() {
                             }
                             required
                         />
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-gray-900 mt-1">
                             1.20 = 20% price increase during this period
                         </p>
                     </div>

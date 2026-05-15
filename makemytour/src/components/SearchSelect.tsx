@@ -34,7 +34,7 @@ export function SearchSelect({ options, placeholder, value, onChange, icon, subt
                 <div className="flex items-center space-x-2">
                     {icon}
                     <div className="flex-1 min-w-0">
-                        <div className="text-sm text-gray-500 truncate">{placeholder}</div>
+                        <div className="text-sm text-gray-900 truncate">{placeholder}</div>
                         <Input
                             type="text"
                             value={value || searchTerm}

@@ -35,7 +35,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return (
       <div className="bg-white/95 backdrop-blur border border-gray-200 rounded-lg shadow-lg p-3 text-sm">
         <p className="font-semibold text-gray-900">₹{data.price?.toLocaleString("en-IN")}</p>
-        <p className="text-gray-500 text-xs mt-1">{data.formattedDate}</p>
+        <p className="text-gray-900 text-xs mt-1">{data.formattedDate}</p>
         {data.reason && data.reason !== "BASE_PRICE" && (
           <p className="text-xs mt-1 text-orange-600 font-medium">
             {data.reason.replace(/_/g, " ")}
@@ -102,7 +102,7 @@ export const PriceHistoryChart = ({ entityId, entityType, currentPrice, basePric
           <TrendingUp className="w-5 h-5 text-gray-400" />
           Price History
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-900">
           No price changes recorded yet. The pricing engine updates every minute.
         </p>
       </div>
@@ -134,7 +134,7 @@ export const PriceHistoryChart = ({ entityId, entityType, currentPrice, basePric
           </div>
         )}
         {trendPercent === 0 && basePrice && (
-          <div className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-gray-50 text-gray-600">
+          <div className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-gray-50 text-black">
             <Minus className="w-3.5 h-3.5" />
             At base price
           </div>
@@ -177,10 +177,10 @@ export const PriceHistoryChart = ({ entityId, entityType, currentPrice, basePric
 
       {basePrice && currentPrice && (
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100 text-sm">
-          <span className="text-gray-500">
+          <span className="text-gray-900">
             Base: <span className="font-medium text-gray-700">₹{basePrice.toLocaleString("en-IN")}</span>
           </span>
-          <span className="text-gray-500">
+          <span className="text-gray-900">
             Current: <span className="font-bold text-gray-900">₹{currentPrice.toLocaleString("en-IN")}</span>
           </span>
         </div>

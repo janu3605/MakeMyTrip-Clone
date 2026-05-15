@@ -182,20 +182,20 @@ const index = () => {
                             ) : (
                                 <div className="space-y-6">
                                     <div className="flex items-center space-x-3">
-                                        <User className="w-5 h-5 text-gray-500" />
+                                        <User className="w-5 h-5 text-gray-900" />
                                         <div>
                                             <p className="font-medium">
                                                 {user?.firstName} {user?.lastName}
                                             </p>
-                                            {/* <p className="text-sm text-gray-500">{userData.role}</p> */}
+                                            {/* <p className="text-sm text-gray-900">{userData.role}</p> */}
                                         </div>
                                     </div>
                                     <div className="flex items-center space-x-3">
-                                        <Mail className="w-5 h-5 text-gray-500" />
+                                        <Mail className="w-5 h-5 text-gray-900" />
                                         <p>{user?.email}</p>
                                     </div>
                                     <div className="flex items-center space-x-3">
-                                        <Phone className="w-5 h-5 text-gray-500" />
+                                        <Phone className="w-5 h-5 text-gray-900" />
                                         <p>{user?.phoneNumber}</p>
                                     </div>
                                     <button
@@ -233,7 +233,7 @@ const index = () => {
                                                 )}
                                                 <div>
                                                     <h3 className="font-semibold">{booking?.type}</h3>
-                                                    <p className="text-sm text-gray-500">
+                                                    <p className="text-sm text-gray-900">
                                                         Booking ID: {booking?.bookingId}
                                                     </p>
                                                 </div>
@@ -242,10 +242,10 @@ const index = () => {
                                                 <p className="font-semibold">
                                                     ₹ {booking?.totalPrice.toLocaleString("en-IN")}
                                                 </p>
-                                                <p className="text-sm text-gray-500">{booking?.type}</p>
+                                                <p className="text-sm text-gray-900">{booking?.type}</p>
                                             </div>
                                         </div>
-                                        <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                                        <div className="flex flex-wrap gap-4 text-sm text-black">
                                             <div className="flex items-center space-x-1">
                                                 <Calendar className="w-4 h-4" />
                                                 <span>{formatDate(booking?.date)}</span>
