@@ -277,4 +277,14 @@ export const addSeasonalRule = async (name, startDate, endDate, multiplier) => {
     console.error("Error adding seasonal rule:", error.message);
     throw error;
   }
+};
+
+export const cancelBooking = async (userId, bookingId, reason) => {
+  try {
+    const res = await axios.post(`${BACKEND_URL}/booking/cancel?userId=${userId}&bookingId=${bookingId}&reason=${reason}`);
+    return res.data;
+  } catch (error) {
+    console.error("Error cancelling booking:", error.message);
+    throw error;
+  }
 };

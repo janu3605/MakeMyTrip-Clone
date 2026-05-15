@@ -358,11 +358,15 @@ export default function Home() {
                       // Build unique routes from flight data
                       const routeSet = new Set<string>();
                       const routes: { from: string; to: string }[] = [];
+                      const now = new Date();
                       flight.forEach((f: any) => {
-                        const key = `${f.from}-${f.to}`;
-                        if (!routeSet.has(key)) {
-                          routeSet.add(key);
-                          routes.push({ from: f.from, to: f.to });
+                        const departure = new Date(f.departureTime);
+                        if ((departure.getTime() - now.getTime()) > 0) { // Only future flights
+                          const key = `${f.from}-${f.to}`;
+                          if (!routeSet.has(key)) {
+                            routeSet.add(key);
+                            routes.push({ from: f.from, to: f.to });
+                          }
                         }
                       });
                       return routes.slice(0, 8).map((r, i) => (

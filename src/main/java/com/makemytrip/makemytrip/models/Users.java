@@ -80,11 +80,66 @@ public class Users {
 
     public static class Booking {
 
+        private String id = java.util.UUID.randomUUID().toString();
         private String type;
         private String bookingId;
         private String date;
         private int quantity;
         private double totalPrice;
+        private String status = "CONFIRMED"; // CONFIRMED or CANCELLED
+        private String cancellationReason;
+        private double refundAmount;
+        private String refundStatus; // PENDING, PROCESSED, COMPLETED
+        private String cancellationDate;
+
+        // Getters and Setters
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
+
+        public String getCancellationReason() {
+            return cancellationReason;
+        }
+
+        public void setCancellationReason(String cancellationReason) {
+            this.cancellationReason = cancellationReason;
+        }
+
+        public double getRefundAmount() {
+            return refundAmount;
+        }
+
+        public void setRefundAmount(double refundAmount) {
+            this.refundAmount = refundAmount;
+        }
+
+        public String getRefundStatus() {
+            return refundStatus;
+        }
+
+        public void setRefundStatus(String refundStatus) {
+            this.refundStatus = refundStatus;
+        }
+
+        public String getCancellationDate() {
+            return cancellationDate;
+        }
+
+        public void setCancellationDate(String cancellationDate) {
+            this.cancellationDate = cancellationDate;
+        }
 
         // Getters and Setters
         public String getType() {

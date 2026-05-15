@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 @Service
@@ -75,6 +77,67 @@ public class BookingService {
             }
         }
         throw new RuntimeException("User or flight not found");
+    }
+
+    public Booking cancelBooking(String userId, String uniqueBookingId, String reason) {
+        Optional<Users> usersOptional = userRepository.findById(userId);
+        if (usersOptional.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+        Users user = usersOptional.get();
+
+        Booking targetBooking = null;
+        for (Booking b : user.getBookings()) {
+            if (b.getId().equals(uniqueBookingId)) {
+                targetBooking = b;
+                break;
+            }
+        }
+
+        if (targetBooking == null) {
+            throw new RuntimeException("Booking not found");
+        }
+
+        if ("CANCELLED".equals(targetBooking.getStatus())) {
+            throw new RuntimeException("Booking is already cancelled");
+        }
+
+        // Calculate refund
+        LocalDate bookingDate = LocalDate.parse(targetBooking.getDate());
+        long daysBetween = ChronoUnit.DAYS.between(bookingDate, LocalDate.now());
+        
+        double refundPercent = 0.0;
+        if (daysBetween <= 1) {
+            refundPercent = 0.50; // 50% refund within 24 hours
+        } else {
+            refundPercent = 0.20; // 20% refund after 24 hours
+        }
+
+        targetBooking.setStatus("CANCELLED");
+        targetBooking.setCancellationReason(reason);
+        targetBooking.setRefundAmount(targetBooking.getTotalPrice() * refundPercent);
+        targetBooking.setRefundStatus("PENDING");
+        targetBooking.setCancellationDate(LocalDateTime.now().toString());
+
+        // Restore inventory
+        if ("Flight".equalsIgnoreCase(targetBooking.getType())) {
+            Optional<Flight> flightOpt = flightRepository.findById(targetBooking.getBookingId());
+            if (flightOpt.isPresent()) {
+                Flight f = flightOpt.get();
+                f.setAvailableSeats(f.getAvailableSeats() + targetBooking.getQuantity());
+                flightRepository.save(f);
+            }
+        } else if ("Hotel".equalsIgnoreCase(targetBooking.getType())) {
+            Optional<Hotel> hotelOpt = hotelRepository.findById(targetBooking.getBookingId());
+            if (hotelOpt.isPresent()) {
+                Hotel h = hotelOpt.get();
+                h.setAvailableRooms(h.getAvailableRooms() + targetBooking.getQuantity());
+                hotelRepository.save(h);
+            }
+        }
+
+        userRepository.save(user);
+        return targetBooking;
     }
 
 }
