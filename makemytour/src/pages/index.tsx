@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useGlobalFlightTracking } from "@/hooks/useGlobalFlightTracking";
 import { LiveTracker } from "@/components/Flights/LiveTracker";
 import { PriceBadge } from "@/components/Pricing/PriceBadge";
+import { ArrowRight } from "lucide-react";
 import {
   Bus,
   Calendar,
@@ -154,8 +155,11 @@ export default function Home() {
       });
       setsearchresult(results);
     } else if (bookingtype === "hotels") {
+      const searchTerm = to.toLowerCase().trim();
       const results = hotel.filter(
-        (hotel) => hotel.location.toLowerCase() === to.toLowerCase()
+        (h) =>
+          h.location.toLowerCase().includes(searchTerm) ||
+          searchTerm.includes(h.location.toLowerCase())
       );
       setsearchresult(results);
     }
@@ -341,6 +345,64 @@ export default function Home() {
               SEARCH
             </Button>
           </div>
+
+          {/* Quick Picks — show available routes/hotels */}
+          {searchresults.length === 0 && (
+            <div className="mt-5 pt-4 border-t border-gray-100">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                {bookingtype === "flights" ? "Popular Flight Routes" : "Popular Hotel Destinations"}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {bookingtype === "flights"
+                  ? (() => {
+                      // Build unique routes from flight data
+                      const routeSet = new Set<string>();
+                      const routes: { from: string; to: string }[] = [];
+                      flight.forEach((f: any) => {
+                        const key = `${f.from}-${f.to}`;
+                        if (!routeSet.has(key)) {
+                          routeSet.add(key);
+                          routes.push({ from: f.from, to: f.to });
+                        }
+                      });
+                      return routes.slice(0, 8).map((r, i) => (
+                        <button
+                          key={i}
+                          onClick={() => {
+                            setfrom(r.from);
+                            setto(r.to);
+                          }}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm
+                                     bg-blue-50 text-blue-700 border border-blue-200
+                                     hover:bg-blue-100 hover:border-blue-300 transition-colors cursor-pointer"
+                        >
+                          {r.from}
+                          <ArrowRight className="w-3 h-3" />
+                          {r.to}
+                        </button>
+                      ));
+                    })()
+                  : (() => {
+                      // Build unique hotel locations
+                      const locSet = new Set<string>();
+                      hotel.forEach((h: any) => locSet.add(h.location));
+                      return Array.from(locSet).slice(0, 8).map((loc, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setto(loc)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm
+                                     bg-emerald-50 text-emerald-700 border border-emerald-200
+                                     hover:bg-emerald-100 hover:border-emerald-300 transition-colors cursor-pointer"
+                        >
+                          <MapPin className="w-3 h-3" />
+                          {loc}
+                        </button>
+                      ));
+                    })()}
+              </div>
+            </div>
+          )}
+
           <div className="mt-6">
             <h2 className="text-xl font-semibold mb-4 text-white">
               Search Results
