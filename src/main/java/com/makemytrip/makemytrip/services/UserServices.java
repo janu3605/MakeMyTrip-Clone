@@ -30,6 +30,7 @@ public class UserServices {
         if (user.getRole() == null) {
             user.setRole("USER");
         }
+        user.setMockBalance(50000.0);
         return userRepository.save(user);
 
     }

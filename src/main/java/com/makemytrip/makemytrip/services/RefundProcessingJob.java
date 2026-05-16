@@ -29,6 +29,7 @@ public class RefundProcessingJob {
                         userUpdated = true;
                     } else if ("PROCESSED".equals(booking.getRefundStatus())) {
                         booking.setRefundStatus("COMPLETED");
+                        user.setMockBalance(user.getMockBalance() + booking.getRefundAmount());
                         userUpdated = true;
                     }
                 }

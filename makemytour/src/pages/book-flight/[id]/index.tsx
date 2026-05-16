@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { PriceHistoryChart } from "@/components/Pricing/PriceHistoryChart";
 import { PriceFreezeButton } from "@/components/Pricing/PriceFreezeButton";
+import { SeatMap } from "@/components/SeatMap";
 
 import {
     Plane,
@@ -50,6 +51,7 @@ const BookFlightPage = () => {
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
     const [open, setopem] = useState(false);
+    const [selectedSeats, setSelectedSeats] = useState<any[]>([]);
     const user = useSelector((state: any) => state.user.user);
     const dispatch = useDispatch();
     useEffect(() => {
@@ -164,8 +166,9 @@ const BookFlightPage = () => {
     const totalTaxes = fareSummary?.taxes * quantity;
     const totalOtherServices = fareSummary?.otherServices * quantity;
     const totalDiscounts = fareSummary?.discounts * quantity;
+    const seatPremium = selectedSeats.reduce((sum: number, s: any) => sum + (s.price - flight.price), 0);
     const grandTotal =
-        totalPrice + totalTaxes + totalOtherServices - totalDiscounts;
+        totalPrice + totalTaxes + totalOtherServices - totalDiscounts + seatPremium;
 
     const handlebooking = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -174,7 +177,9 @@ const BookFlightPage = () => {
                 user?.id,
                 flight?.id,
                 quantity,
-                grandTotal
+                grandTotal,
+                selectedSeats.map((s: any) => s.seatId).join(","),
+                seatPremium
             );
             const updateuser = {
                 ...user,
@@ -403,7 +408,15 @@ const BookFlightPage = () => {
                             entityId={flight.id}
                             entityType="FLIGHT"
                             currentPrice={flight.price}
-                            basePrice={flight.basePrice || flight.price}
+                            basePrice={flight.price}
+                        />
+
+                        {/* Seat Map */}
+                        <SeatMap
+                            basePrice={flight.price}
+                            availableSeats={flight.availableSeats}
+                            quantity={quantity}
+                            onSeatSelect={(seats) => setSelectedSeats(seats)}
                         />
 
                         {/* Cancellation Policy */}

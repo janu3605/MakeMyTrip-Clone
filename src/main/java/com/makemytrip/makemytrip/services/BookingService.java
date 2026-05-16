@@ -27,12 +27,17 @@ public class BookingService {
     @Autowired
     private HotelRepository hotelRepository;
 
-    public Booking bookFlight(String userId, String flightId, int seats, double price) {
+    public Booking bookFlight(String userId, String flightId, int seats, double price, String selectedSeat, double seatPremium) {
         Optional<Users> usersOptional = userRepository.findById(userId);
         Optional<Flight> flightOptional = flightRepository.findById(flightId);
         if (usersOptional.isPresent() && flightOptional.isPresent()) {
             Users user = usersOptional.get();
             Flight flight = flightOptional.get();
+
+            if (user.getMockBalance() < price) {
+                throw new RuntimeException("Insufficient mock balance");
+            }
+
             if (flight.getAvailableSeats() >= seats) {
                 flight.setAvailableSeats(flight.getAvailableSeats() - seats);
                 flightRepository.save(flight);
@@ -43,7 +48,10 @@ public class BookingService {
                 booking.setDate(LocalDate.now().toString());
                 booking.setQuantity(seats);
                 booking.setTotalPrice(price);
+                booking.setSelectedSeat(selectedSeat);
+                booking.setSeatRoomPremium(seatPremium);
                 user.getBookings().add(booking);
+                user.setMockBalance(user.getMockBalance() - price);
                 userRepository.save(user);
                 return booking;
             } else {
@@ -53,12 +61,17 @@ public class BookingService {
         throw new RuntimeException("User or flight not found");
     }
 
-    public Booking bookhotel(String userId, String hotelId, int rooms, double price) {
+    public Booking bookhotel(String userId, String hotelId, int rooms, double price, String selectedRoom, double roomPremium) {
         Optional<Users> usersOptional = userRepository.findById(userId);
         Optional<Hotel> hotelOptional = hotelRepository.findById(hotelId);
         if (usersOptional.isPresent() && hotelOptional.isPresent()) {
             Users user = usersOptional.get();
             Hotel hotel = hotelOptional.get();
+
+            if (user.getMockBalance() < price) {
+                throw new RuntimeException("Insufficient mock balance");
+            }
+
             if (hotel.getAvailableRooms() >= rooms) {
                 hotel.setAvailableRooms(hotel.getAvailableRooms() - rooms);
                 hotelRepository.save(hotel);
@@ -69,7 +82,10 @@ public class BookingService {
                 booking.setDate(LocalDate.now().toString());
                 booking.setQuantity(rooms);
                 booking.setTotalPrice(price);
+                booking.setSelectedRoom(selectedRoom);
+                booking.setSeatRoomPremium(roomPremium);
                 user.getBookings().add(booking);
+                user.setMockBalance(user.getMockBalance() - price);
                 userRepository.save(user);
                 return booking;
             } else {

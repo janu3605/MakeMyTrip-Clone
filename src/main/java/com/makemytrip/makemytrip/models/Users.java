@@ -17,6 +17,7 @@ public class Users {
     private String password;
     private String role;
     private String phoneNumber;
+    private double mockBalance = 50000.0;
     private List<Booking> bookings = new ArrayList<>();
 
     ;
@@ -76,6 +77,14 @@ public class Users {
 
     public void setBookings(List<Booking> bookings) {
         this.bookings = bookings;
+    }
+
+    public double getMockBalance() {
+        return mockBalance;
+    }
+
+    public void setMockBalance(double mockBalance) {
+        this.mockBalance = mockBalance;
     }
 
     public static class Booking {
@@ -180,6 +189,34 @@ public class Users {
 
         public void setTotalPrice(double totalPrice) {
             this.totalPrice = totalPrice;
+        }
+
+        private String selectedSeat;   // e.g. "5A", null for hotels
+        private String selectedRoom;   // e.g. "Floor 3 - Suite 2", null for flights
+        private double seatRoomPremium; // extra cost from seat/room tier upgrade
+
+        public String getSelectedSeat() {
+            return selectedSeat;
+        }
+
+        public void setSelectedSeat(String selectedSeat) {
+            this.selectedSeat = selectedSeat;
+        }
+
+        public String getSelectedRoom() {
+            return selectedRoom;
+        }
+
+        public void setSelectedRoom(String selectedRoom) {
+            this.selectedRoom = selectedRoom;
+        }
+
+        public double getSeatRoomPremium() {
+            return seatRoomPremium;
+        }
+
+        public void setSeatRoomPremium(double seatRoomPremium) {
+            this.seatRoomPremium = seatRoomPremium;
         }
     }
 }

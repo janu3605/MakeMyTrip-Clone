@@ -14,12 +14,17 @@ import com.makemytrip.makemytrip.models.PriceFreeze;
 import com.makemytrip.makemytrip.repositories.FlightRepository;
 import com.makemytrip.makemytrip.repositories.HotelRepository;
 import com.makemytrip.makemytrip.repositories.PriceFreezeRepository;
+import com.makemytrip.makemytrip.repositories.UserRepository;
+import com.makemytrip.makemytrip.models.Users;
 
 @Service
 public class PriceFreezeService {
 
     @Autowired
     private PriceFreezeRepository priceFreezeRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private FlightRepository flightRepository;
@@ -53,6 +58,19 @@ public class PriceFreezeService {
         // Get current price
         double currentPrice = getCurrentPrice(entityId, entityType);
         double fee = calculateFreezeFee(quantity);
+
+        Optional<Users> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+        Users user = userOpt.get();
+        if (user.getMockBalance() < fee) {
+            throw new RuntimeException("Insufficient mock balance to freeze price");
+        }
+        
+        // Deduct fee
+        user.setMockBalance(user.getMockBalance() - fee);
+        userRepository.save(user);
 
         PriceFreeze freeze = new PriceFreeze(userId, entityId, entityType,
                 currentPrice, fee, quantity);

@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { PriceHistoryChart } from "@/components/Pricing/PriceHistoryChart";
 import { PriceFreezeButton } from "@/components/Pricing/PriceFreezeButton";
+import { RoomGrid } from "@/components/RoomGrid";
 import {
     Star,
     MapPin,
@@ -48,6 +49,7 @@ const BookHotelPage = () => {
     const [loading, setLoading] = useState(true);
     const user = useSelector((state: any) => state.user.user);
     const [open, setopem] = useState(false);
+    const [selectedRooms, setSelectedRooms] = useState<any[]>([]);
     const dispatch = useDispatch();
     useEffect(() => {
         const fetchhotels = async () => {
@@ -116,7 +118,8 @@ const BookHotelPage = () => {
     const totalPrice = hotel?.pricePerNight * quantity;
     const totalTaxes = hotelData?.room.taxes * quantity;
     const totalDiscounts = hotelData?.room.discountedPrice * quantity;
-    const grandTotal = totalPrice + totalTaxes - totalDiscounts;
+    const roomPremium = selectedRooms.reduce((sum: number, r: any) => sum + (r.price - hotel.pricePerNight), 0);
+    const grandTotal = totalPrice + totalTaxes - totalDiscounts + roomPremium;
     const handlebooking = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
@@ -124,7 +127,9 @@ const BookHotelPage = () => {
                 user?.id,
                 hotel?.id,
                 quantity,
-                grandTotal
+                grandTotal,
+                selectedRooms.map((r: any) => `Floor ${r.floor} - ${r.roomType}`).join(","),
+                roomPremium
             );
             const updateuser = {
                 ...user,
@@ -350,6 +355,14 @@ const BookHotelPage = () => {
                             entityType="HOTEL"
                             currentPrice={hotel.pricePerNight}
                             basePrice={hotel.pricePerNight}
+                        />
+
+                        {/* Room Selection Grid */}
+                        <RoomGrid
+                            basePrice={hotel.pricePerNight}
+                            availableRooms={hotel.availableRooms}
+                            quantity={quantity}
+                            onRoomSelect={(rooms) => setSelectedRooms(rooms)}
                         />
                     </div>
 

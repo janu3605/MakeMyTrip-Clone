@@ -144,8 +144,17 @@ const index = () => {
         <div className="min-h-screen bg-gray-50 pt-8 px-4">
             <div className="max-w-6xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {/* Profile Section */}
-                    <div className="md:col-span-1">
+                    {/* Sidebar: Wallet & Profile */}
+                    <div className="md:col-span-1 space-y-6">
+                        {/* Wallet Balance Card */}
+                        <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl shadow-lg p-6 text-white">
+                            <h2 className="text-sm font-medium opacity-80 mb-1">My Wallet Balance</h2>
+                            <p className="text-3xl font-bold">
+                                ₹ {user?.mockBalance ? user.mockBalance.toLocaleString("en-IN") : "0"}
+                            </p>
+                        </div>
+
+                        {/* Profile Section */}
                         <div className="bg-white rounded-xl shadow-lg p-6">
                             <div className="flex justify-between items-start mb-6">
                                 <h2 className="text-2xl font-bold">Profile</h2>
