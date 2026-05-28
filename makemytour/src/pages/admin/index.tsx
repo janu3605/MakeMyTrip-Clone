@@ -30,8 +30,11 @@ import {
     getuserbyemail,
     getSeasonalRules,
     addSeasonalRule,
+    getFlaggedReviews,
+    moderateReview,
 } from "@/api";
 import HotelList from "@/components/Hotel/Hotel";
+import { ReviewCard } from "@/components/Reviews/ReviewCard";
 const mockFlights = [
     {
         _id: "1",
@@ -599,6 +602,83 @@ function SeasonalRulesManager() {
     );
 }
 
+function FlaggedReviewsManager() {
+    const [flaggedReviews, setFlaggedReviews] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchFlaggedReviews = async () => {
+        setLoading(true);
+        try {
+            const data = await getFlaggedReviews();
+            setFlaggedReviews(Array.isArray(data) ? data : []);
+        } catch (error) {
+            console.error("Failed to fetch flagged reviews", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchFlaggedReviews();
+    }, []);
+
+    const handleModerate = async (reviewId: string, action: string) => {
+        try {
+            await moderateReview(reviewId, action);
+            fetchFlaggedReviews();
+        } catch (error) {
+            console.error(`Failed to ${action} review`, error);
+        }
+    };
+
+    if (loading) {
+        return <p className="text-gray-900">Loading flagged reviews...</p>;
+    }
+
+    if (flaggedReviews.length === 0) {
+        return <p className="text-gray-900">No flagged reviews requiring moderation.</p>;
+    }
+
+    return (
+        <div className="space-y-6">
+            {flaggedReviews.map((review) => (
+                <div key={review.id} className="border border-red-200 rounded-xl bg-red-50 p-4">
+                    <div className="flex justify-between items-start mb-4">
+                        <div>
+                            <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded-full mb-2 inline-block">
+                                Flagged for: {review.flagReason || "Inappropriate Content"}
+                            </span>
+                            <p className="text-sm text-gray-600">
+                                Flagged by User ID: {review.flaggedBy || "Unknown"}
+                            </p>
+                        </div>
+                        <div className="flex gap-2">
+                            <Button
+                                variant="outline"
+                                className="bg-white text-green-700 hover:bg-green-50 border-green-200"
+                                onClick={() => handleModerate(review.id, "APPROVED")}
+                            >
+                                Approve & Restore
+                            </Button>
+                            <Button
+                                variant="destructive"
+                                onClick={() => handleModerate(review.id, "REJECTED")}
+                            >
+                                Reject & Remove
+                            </Button>
+                        </div>
+                    </div>
+                    
+                    {/* Render the actual review card in read-only style */}
+                    <div className="opacity-80 pointer-events-none">
+                        <ReviewCard review={review} onReviewUpdate={() => {}} />
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+}
+
 export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState("flights");
     const [selectedFlight, setSelectedFlight] = useState(null);
@@ -608,11 +688,12 @@ export default function AdminDashboard() {
         <div className="container mx-auto p-4 bg-white max-w-full">
             <h1 className="text-3xl font-bold mb-6 ">Admin Dashboard</h1>
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-4  text-black">
+                <TabsList className="grid w-full grid-cols-5  text-black">
                     <TabsTrigger value="flights">Flights</TabsTrigger>
                     <TabsTrigger value="hotels">Hotels</TabsTrigger>
                     <TabsTrigger value="users">Users</TabsTrigger>
                     <TabsTrigger value="pricing">Pricing</TabsTrigger>
+                    <TabsTrigger value="moderation">Moderation</TabsTrigger>
                 </TabsList>
                 <TabsContent value="flights">
                     <Card>
@@ -669,6 +750,19 @@ export default function AdminDashboard() {
                         </CardHeader>
                         <CardContent>
                             <SeasonalRulesManager />
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+                <TabsContent value="moderation">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Review Moderation</CardTitle>
+                            <CardDescription>
+                                Review and moderate flagged user reviews.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <FlaggedReviewsManager />
                         </CardContent>
                     </Card>
                 </TabsContent>

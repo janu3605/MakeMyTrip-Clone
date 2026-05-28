@@ -287,4 +287,100 @@ export const cancelBooking = async (userId, bookingId, reason) => {
     console.error("Error cancelling booking:", error.message);
     throw error;
   }
+};
+
+// ========== REVIEW & RATING APIs ==========
+
+export const createReview = async (reviewData) => {
+  try {
+    const res = await axios.post(`${BACKEND_URL}/api/reviews`, reviewData);
+    return res.data;
+  } catch (error) {
+    console.error("Error creating review:", error.message);
+    throw error;
+  }
+};
+
+export const getReviews = async (entityId, entityType, sortBy = "newest") => {
+  try {
+    const res = await axios.get(
+      `${BACKEND_URL}/api/reviews?entityId=${entityId}&entityType=${entityType}&sortBy=${sortBy}`
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching reviews:", error.message);
+    return [];
+  }
+};
+
+export const getRatingSummary = async (entityId, entityType) => {
+  try {
+    const res = await axios.get(
+      `${BACKEND_URL}/api/reviews/rating?entityId=${entityId}&entityType=${entityType}`
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching rating summary:", error.message);
+    return { averageRating: 0, totalReviews: 0, ratingDistribution: {} };
+  }
+};
+
+export const addReviewReply = async (reviewId, replyData) => {
+  try {
+    const res = await axios.post(
+      `${BACKEND_URL}/api/reviews/${reviewId}/reply`,
+      replyData
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error adding reply:", error.message);
+    throw error;
+  }
+};
+
+export const voteHelpful = async (reviewId, userId) => {
+  try {
+    const res = await axios.post(
+      `${BACKEND_URL}/api/reviews/${reviewId}/helpful?userId=${userId}`
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error voting helpful:", error.message);
+    throw error;
+  }
+};
+
+export const flagReview = async (reviewId, flagData) => {
+  try {
+    const res = await axios.post(
+      `${BACKEND_URL}/api/reviews/${reviewId}/flag`,
+      flagData
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error flagging review:", error.message);
+    throw error;
+  }
+};
+
+export const getFlaggedReviews = async () => {
+  try {
+    const res = await axios.get(`${BACKEND_URL}/api/reviews/flagged`);
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching flagged reviews:", error.message);
+    return [];
+  }
+};
+
+export const moderateReview = async (reviewId, action) => {
+  try {
+    const res = await axios.post(
+      `${BACKEND_URL}/api/reviews/${reviewId}/moderate?action=${action}`
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error moderating review:", error.message);
+    throw error;
+  }
 };

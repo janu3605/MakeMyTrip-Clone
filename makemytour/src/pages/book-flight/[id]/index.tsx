@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { PriceHistoryChart } from "@/components/Pricing/PriceHistoryChart";
 import { PriceFreezeButton } from "@/components/Pricing/PriceFreezeButton";
 import { SeatMap } from "@/components/SeatMap";
+import ReviewSection from "@/components/Reviews/ReviewSection";
 
 import {
     Plane,
@@ -503,6 +504,11 @@ const BookFlightPage = () => {
                                     </div>
                                 ))}
                             </div>
+                        </div>
+
+                        {/* Reviews Section */}
+                        <div className="bg-white rounded-xl shadow-sm p-6 mt-6">
+                            <ReviewSection entityId={flight.id} entityType="FLIGHT" />
                         </div>
                     </div>
 

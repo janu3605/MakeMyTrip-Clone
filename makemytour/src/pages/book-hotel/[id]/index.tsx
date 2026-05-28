@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { PriceHistoryChart } from "@/components/Pricing/PriceHistoryChart";
 import { PriceFreezeButton } from "@/components/Pricing/PriceFreezeButton";
 import { RoomGrid } from "@/components/RoomGrid";
+import ReviewSection from "@/components/Reviews/ReviewSection";
 import {
     Star,
     MapPin,
@@ -490,6 +491,11 @@ const BookHotelPage = () => {
                                 </div>
                                 <button className="text-blue-500">See on Map</button>
                             </div>
+                        </div>
+
+                        {/* Reviews Section */}
+                        <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
+                            <ReviewSection entityId={hotel.id} entityType="HOTEL" />
                         </div>
                     </div>
                 </div>
