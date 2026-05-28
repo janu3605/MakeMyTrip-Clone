@@ -383,4 +383,45 @@ export const moderateReview = async (reviewId, action) => {
     console.error("Error moderating review:", error.message);
     throw error;
   }
+};
+
+// ========== RECOMMENDATION APIs ==========
+
+export const getRecommendations = async (userId, type) => {
+  try {
+    let url = `${BACKEND_URL}/api/recommendations?userId=${userId}`;
+    if (type) url += `&type=${type}`;
+    const res = await axios.get(url);
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching recommendations:", error.message);
+    return [];
+  }
+};
+
+export const getTrendingRecommendations = async () => {
+  try {
+    const res = await axios.get(`${BACKEND_URL}/api/recommendations/trending`);
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching trending recommendations:", error.message);
+    return [];
+  }
+};
+
+export const submitRecommendationFeedback = async (
+  recommendationId,
+  userId,
+  feedback
+) => {
+  try {
+    const res = await axios.post(
+      `${BACKEND_URL}/api/recommendations/${recommendationId}/feedback`,
+      { userId, feedback }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error submitting recommendation feedback:", error.message);
+    throw error;
+  }
 };

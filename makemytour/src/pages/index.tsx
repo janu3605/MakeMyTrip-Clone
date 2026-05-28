@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useGlobalFlightTracking } from "@/hooks/useGlobalFlightTracking";
 import { LiveTracker } from "@/components/Flights/LiveTracker";
 import { PriceBadge } from "@/components/Pricing/PriceBadge";
+import RecommendationCarousel from "@/components/Recommendations/RecommendationCarousel";
 import { ArrowRight } from "lucide-react";
 import {
   Bus,
@@ -485,6 +486,11 @@ export default function Home() {
             )}
           </div>
         </div>
+        {/* Personalized Recommendations Section */}
+        <div className="max-w-7xl mx-auto px-4 mt-8">
+          <RecommendationCarousel />
+        </div>
+
         <div className="max-w-7xl mx-auto px-4">
           {/* Offers Section */}
           <section className="my-16">
