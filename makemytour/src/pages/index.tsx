@@ -43,18 +43,24 @@ export default function Home() {
       description: "Get up to 20% off on domestic flights",
       imageUrl:
         "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800",
+      type: "flights",
+      location: "Bengaluru",
     },
     {
-      title: "International Hotels",
-      description: "Book luxury hotels worldwide",
+      title: "Luxury Hotels",
+      description: "Book luxury hotels in major cities",
       imageUrl:
         "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800",
+      type: "hotels",
+      location: "Mumbai",
     },
     {
-      title: "Holiday Packages",
-      description: "Exclusive deals on holiday packages",
+      title: "Holiday Deals",
+      description: "Exclusive deals on flights to Delhi",
       imageUrl:
         "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800",
+      type: "flights",
+      location: "New Delhi",
     },
   ];
 
@@ -90,21 +96,25 @@ export default function Home() {
       title: "Shimla's Best Kept Secret",
       imageUrl:
         "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=800",
+      location: "Shimla",
     },
     {
-      title: "Tamil Nadu's Charming Hill Town",
+      title: "Chennai's Charming Coastal Town",
       imageUrl:
         "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=800",
+      location: "Chennai",
     },
     {
-      title: "Quaint Little Hill Station in Gujarat",
+      title: "Quaint Little Hill Station in Pune",
       imageUrl:
         "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800",
+      location: "Pune",
     },
     {
       title: "A pleasant summer retreat",
       imageUrl:
         "https://images.unsplash.com/photo-1593181629936-11c609b8db9b?auto=format&fit=crop&w=800",
+      location: "Darjeeling",
     },
   ];
 
@@ -140,6 +150,37 @@ export default function Home() {
   if (loading) {
     return <Loader />;
   }
+
+  const handleCardClick = (type: string, loc: string) => {
+    setbookingtype(type);
+    setto(loc);
+    setfrom("");
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // We trigger the search using the updated values since state update is async
+    const now = new Date();
+    if (type === "flights") {
+      const results = flight.filter((FLIGHT) => {
+        const departure = new Date(FLIGHT.departureTime);
+        const timeDiffMinutes = (departure.getTime() - now.getTime()) / (1000 * 60);
+
+        return (
+          FLIGHT.to.toLowerCase() === loc.toLowerCase() &&
+          timeDiffMinutes > 10 // RULE: Hide if less than 10 mins to boarding
+        );
+      });
+      setsearchresult(results);
+    } else if (type === "hotels") {
+      const searchTerm = loc.toLowerCase().trim();
+      const results = hotel.filter(
+        (h) =>
+          h.location.toLowerCase().includes(searchTerm) ||
+          searchTerm.includes(h.location.toLowerCase())
+      );
+      setsearchresult(results);
+    }
+  };
+
   const handlesearch = () => {
     const now = new Date();
 
@@ -497,7 +538,7 @@ export default function Home() {
             <h2 className="text-2xl font-bold mb-8 text-white">Best Offers</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {offers.map((offer, index) => (
-                <OfferCard key={index} {...offer} />
+                <OfferCard key={index} {...offer} onClick={() => handleCardClick(offer.type, offer.location)} />
               ))}
             </div>
           </section>
@@ -511,7 +552,7 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {collections.map((collection, index) => (
-                <CollectionCard key={index} {...collection} />
+                <CollectionCard key={index} {...collection} onClick={() => handleCardClick("hotels", collection.title.split(" ").pop() || "")} />
               ))}
             </div>
           </section>
@@ -525,7 +566,7 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {wonders.map((wonder, index) => (
-                <WonderCard key={index} {...wonder} />
+                <WonderCard key={index} {...wonder} onClick={() => handleCardClick("hotels", wonder.location)} />
               ))}
             </div>
           </section>
@@ -537,14 +578,14 @@ export default function Home() {
     </div>
   );
 }
-const OfferCard = ({ title, description, imageUrl }: any) => {
+const OfferCard = ({ title, description, imageUrl, onClick }: any) => {
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow" onClick={onClick}>
       <img src={imageUrl} alt={title} className="w-full h-48 object-cover" />
       <div className="p-4">
         <h3 className="font-semibold text-lg mb-2">{title}</h3>
         <p className="text-black text-sm">{description}</p>
-        <button className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+        <button className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors" onClick={(e) => { e.stopPropagation(); onClick(); }}>
           Book Now
         </button>
       </div>
@@ -552,9 +593,9 @@ const OfferCard = ({ title, description, imageUrl }: any) => {
   );
 };
 
-const CollectionCard = ({ title, imageUrl, tag }: any) => {
+const CollectionCard = ({ title, imageUrl, tag, onClick }: any) => {
   return (
-    <div className="relative group cursor-pointer overflow-hidden rounded-lg">
+    <div className="relative group cursor-pointer overflow-hidden rounded-lg" onClick={onClick}>
       <img
         src={imageUrl}
         alt={title}
@@ -606,9 +647,9 @@ const DownloadApp = () => {
   );
 };
 
-const WonderCard = ({ title, imageUrl }: any) => {
+const WonderCard = ({ title, imageUrl, onClick }: any) => {
   return (
-    <div className="relative group cursor-pointer overflow-hidden rounded-lg">
+    <div className="relative group cursor-pointer overflow-hidden rounded-lg" onClick={onClick}>
       <img
         src={imageUrl}
         alt={title}

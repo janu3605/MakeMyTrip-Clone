@@ -256,10 +256,8 @@ const BookFlightPage = () => {
                         <Input
                             id="quantity"
                             type="number"
-                            min="1"
-                            max={flight.availableSeats}
                             value={quantity}
-                            onChange={handleQuantityChange}
+                            readOnly
                         />
                     </div>
                 </div>
@@ -520,6 +518,20 @@ const BookFlightPage = () => {
                                 <CreditCard className="w-5 h-5 mr-2 text-black" />
                                 Fare Summary
                             </h2>
+                            <div className="space-y-2 mb-6">
+                                <Label htmlFor="mainQuantity" className="flex items-center mb-2">
+                                    <Users className="w-4 h-4 mr-2" />
+                                    Number of Passengers
+                                </Label>
+                                <Input
+                                    id="mainQuantity"
+                                    type="number"
+                                    min="1"
+                                    max={flight.availableSeats}
+                                    value={quantity}
+                                    onChange={handleQuantityChange}
+                                />
+                            </div>
                             <div className="space-y-2">
                                 <div className="flex justify-between items-center">
                                     <span className="text-black">Base Fare</span>

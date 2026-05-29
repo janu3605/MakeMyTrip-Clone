@@ -17,10 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.makemytrip.makemytrip.models.Flight;
 import com.makemytrip.makemytrip.models.Hotel;
 import com.makemytrip.makemytrip.models.PriceHistory;
+import com.makemytrip.makemytrip.models.Review;
 import com.makemytrip.makemytrip.models.Users;
 import com.makemytrip.makemytrip.repositories.FlightRepository;
 import com.makemytrip.makemytrip.repositories.HotelRepository;
 import com.makemytrip.makemytrip.repositories.PriceHistoryRepository;
+import com.makemytrip.makemytrip.repositories.ReviewRepository;
 import com.makemytrip.makemytrip.repositories.UserRepository;
 
 @RestController
@@ -40,6 +42,9 @@ public class AdminController {
     @Autowired
     private PriceHistoryRepository priceHistoryRepository;
 
+    @Autowired
+    private ReviewRepository reviewRepository;
+
     @GetMapping("/users")
     public ResponseEntity<List<Users>> getallusers() {
         List<Users> users = userRepository.findAll();
@@ -56,13 +61,18 @@ public class AdminController {
 
         // Generate random price history entries (5-10 records over the past 7 days)
         generateRandomPriceHistory(savedFlight.getId(), "FLIGHT", savedFlight.getPrice());
+        
+        // Generate mock reviews
+        generateMockReviews(savedFlight.getId(), "FLIGHT");
 
         return savedFlight;
     }
 
     @PostMapping("/hotel")
     public Hotel addhotel(@RequestBody Hotel hotel) {
-        return hotelRepository.save(hotel);
+        Hotel savedHotel = hotelRepository.save(hotel);
+        generateMockReviews(savedHotel.getId(), "HOTEL");
+        return savedHotel;
     }
 
     @PutMapping("flight/{id}")
@@ -122,6 +132,57 @@ public class AdminController {
             PriceHistory history = new PriceHistory(entityId, entityType, prevPrice, newPrice, multiplier, reason);
             priceHistoryRepository.save(history);
             prevPrice = newPrice;
+        }
+    }
+
+    @PostMapping("/populate-reviews")
+    public ResponseEntity<String> populateReviews() {
+        List<Flight> flights = flightRepository.findAll();
+        for (Flight f : flights) {
+            if (reviewRepository.findByEntityIdAndEntityType(f.getId(), "FLIGHT").isEmpty()) {
+                generateMockReviews(f.getId(), "FLIGHT");
+            }
+        }
+        List<Hotel> hotels = hotelRepository.findAll();
+        for (Hotel h : hotels) {
+            if (reviewRepository.findByEntityIdAndEntityType(h.getId(), "HOTEL").isEmpty()) {
+                generateMockReviews(h.getId(), "HOTEL");
+            }
+        }
+        return ResponseEntity.ok("Reviews populated successfully");
+    }
+
+    private void generateMockReviews(String entityId, String entityType) {
+        java.util.Random rand = new java.util.Random();
+        int count = 3 + rand.nextInt(4); // 3 to 6 reviews
+        String[] users = {"John Doe", "Jane Smith", "Alex Johnson", "Emily Davis", "Chris Brown", "Katie Wilson"};
+        String[] titles = {"Great experience", "Good value for money", "Could be better", "Excellent service", "Not bad", "Loved it!"};
+        String[] contents = {
+            "I had a wonderful time. The service was top notch and everything was as expected.",
+            "Overall a good experience, but there is some room for improvement.",
+            "It was okay. Nothing too special but nothing terrible either.",
+            "Absolutely loved it! Would highly recommend to anyone.",
+            "Good value for the price. The staff were friendly.",
+            "Had some minor issues, but they were resolved quickly. Good experience."
+        };
+
+        for (int i = 0; i < count; i++) {
+            Review review = new Review();
+            review.setEntityId(entityId);
+            review.setEntityType(entityType);
+            review.setUserId(java.util.UUID.randomUUID().toString()); // Mock user ID
+            review.setUserName(users[rand.nextInt(users.length)]);
+            review.setRating(3 + rand.nextInt(3)); // 3, 4, or 5
+            review.setTitle(titles[rand.nextInt(titles.length)]);
+            review.setContent(contents[rand.nextInt(contents.length)]);
+            review.setModerationStatus("APPROVED");
+            
+            // Random past date
+            java.time.Instant timestamp = java.time.Instant.now().minus(java.time.Duration.ofDays(rand.nextInt(30)));
+            review.setCreatedAt(timestamp.toString());
+            review.setUpdatedAt(timestamp.toString());
+
+            reviewRepository.save(review);
         }
     }
 }

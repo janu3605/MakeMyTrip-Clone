@@ -203,10 +203,8 @@ const BookHotelPage = () => {
                         <Input
                             id="quantity"
                             type="number"
-                            min="1"
-                            max={hotel.availableRooms}
                             value={quantity}
-                            onChange={handleQuantityChange}
+                            readOnly
                         />
                     </div>
                 </div>
@@ -413,6 +411,22 @@ const BookHotelPage = () => {
                                     <p className="text-black">{hotel.amenities}</p>
                                 </div>
                             </div>
+                            
+                            <div className="space-y-2 mb-6">
+                                <Label htmlFor="mainQuantity" className="flex items-center mb-2">
+                                    <Ticket className="w-4 h-4 mr-2" />
+                                    Number of Rooms
+                                </Label>
+                                <Input
+                                    id="mainQuantity"
+                                    type="number"
+                                    min="1"
+                                    max={hotel.availableRooms}
+                                    value={quantity}
+                                    onChange={handleQuantityChange}
+                                />
+                            </div>
+
                             <div className="space-y-2 mb-6">
                                 <div className="flex items-center justify-between">
                                     <span className="text-gray-900 line-through">
