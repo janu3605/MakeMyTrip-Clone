@@ -114,12 +114,26 @@ const index = () => {
         }
         setIsCancelling(true);
         try {
-            await cancelBooking(user.id, bookingToCancel.id, cancelReason);
-            toast.success("Booking cancelled successfully!");
+            const cancelledBooking = await cancelBooking(user.id, bookingToCancel.id, cancelReason);
+            const refundAmount = cancelledBooking?.refundAmount || getRefundPreview(bookingToCancel);
+            toast.success(`Booking cancelled! Refund of ₹${refundAmount.toLocaleString("en-IN")} will be processed.`);
             setCancelDialogOpen(false);
-            // Refresh user data to see updated booking status
+            // Refresh user data from backend to get updated balance & booking status
             const updatedUser = await getuserbyemail(user.email);
-            if (updatedUser) dispatch(setUser(updatedUser));
+            if (updatedUser) {
+                dispatch(setUser(updatedUser));
+            } else {
+                // Fallback: update locally if API fails
+                const updatedBookings = user.bookings.map((b: any) =>
+                    b.id === bookingToCancel.id
+                        ? { ...b, status: "CANCELLED", refundAmount, refundStatus: "PENDING", cancellationReason: cancelReason }
+                        : b
+                );
+                dispatch(setUser({
+                    ...user,
+                    bookings: updatedBookings,
+                }));
+            }
         } catch (error) {
             toast.error("Failed to cancel booking");
         } finally {

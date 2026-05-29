@@ -63,6 +63,21 @@ public class FlightTrackingService {
         return LocalDateTime.now().plusDays(1); 
     }
 
+    private static final String[] DELAY_REASONS = {
+            "Adverse weather conditions at departure airport",
+            "Air traffic congestion causing holding pattern",
+            "Technical maintenance check required",
+            "Late arrival of incoming aircraft",
+            "Crew scheduling adjustment",
+            "Runway maintenance at destination airport",
+            "Security clearance delay",
+            "Baggage loading delay due to heavy volume",
+            "De-icing procedure required",
+            "Airspace restriction imposed by ATC"
+    };
+
+    private final java.util.Random random = new java.util.Random();
+
     @Scheduled(fixedRate = 10000)
     public void tick() {
         if (emitters.isEmpty()) {
@@ -82,28 +97,46 @@ public class FlightTrackingService {
                 String status;
                 int progress = 0;
                 String message = "On Time";
+                String reason = customReasons.getOrDefault(f.getId(), "N/A");
 
                 if (now.isBefore(dep.minusMinutes(10))) {
                     status = "SCHEDULED";
                     message = "Check-in Open";
                 } else if (now.isBefore(dep)) {
                     status = "BOARDING";
-                    message = "Boarding at Gate 4";
+                    message = "Boarding at Gate " + (random.nextInt(20) + 1);
                 } else if (now.isAfter(arr)) {
                     status = "LANDED";
                     progress = 100;
                     message = "Arrived Safely";
+                    // Clear any delay reason once landed
+                    customReasons.remove(f.getId());
                 } else {
-                    status = "IN_AIR";
+                    // Flight is in air — check for random delay
                     long total = Duration.between(dep, arr).toSeconds();
                     long elapsed = Duration.between(dep, now).toSeconds();
                     progress = total > 0 ? (int) ((elapsed * 100) / total) : 100;
                     progress = Math.min(Math.max(progress, 0), 100);
-                    message = "En Route";
+
+                    // ~15% chance of delay per tick (only apply once via customReasons)
+                    if (!customReasons.containsKey(f.getId()) && random.nextInt(100) < 15) {
+                        String delayReason = DELAY_REASONS[random.nextInt(DELAY_REASONS.length)];
+                        customReasons.put(f.getId(), delayReason);
+                    }
+
+                    if (customReasons.containsKey(f.getId())) {
+                        status = "DELAYED";
+                        reason = customReasons.get(f.getId());
+                        int delayMinutes = 15 + random.nextInt(60);
+                        message = "Delayed by approx. " + delayMinutes + " mins — " + reason;
+                    } else {
+                        status = "IN_AIR";
+                        message = "En Route — cruising at FL" + (300 + random.nextInt(100));
+                    }
                 }
 
                 updates.put(f.getId(), new FlightStatusUpdate(
-                        f.getId(), status, message, customReasons.getOrDefault(f.getId(), "N/A"), progress
+                        f.getId(), status, message, reason, progress
                 ));
             } catch (Exception e) {
                 System.out.println("Format error on Flight " + f.getId());

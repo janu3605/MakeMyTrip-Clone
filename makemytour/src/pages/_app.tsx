@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar";
 
 import { useEffect } from "react";
 import Footer from "@/components/Fotter";
+import { Toaster } from "sonner";
 
 const Myapp = ({ Component, pageProps }: AppProps) => {
   useEffect(() => {
@@ -30,6 +31,7 @@ export default function App(props: AppProps) {
         <title>MakeMyTour</title>
       </Head>
       <Myapp {...props} />
+      <Toaster position="top-right" richColors closeButton />
     </Provider>
   );
 }

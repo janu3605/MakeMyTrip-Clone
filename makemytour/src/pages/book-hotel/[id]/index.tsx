@@ -135,6 +135,7 @@ const BookHotelPage = () => {
             const updateuser = {
                 ...user,
                 bookings: [...user.bookings, data],
+                mockBalance: (user.mockBalance || 0) - grandTotal,
             };
             dispatch(setUser(updateuser));
             setopem(false);

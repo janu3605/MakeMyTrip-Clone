@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.makemytrip.makemytrip.models.Flight;
 import com.makemytrip.makemytrip.models.Hotel;
+import com.makemytrip.makemytrip.models.PriceHistory;
 import com.makemytrip.makemytrip.models.Users;
 import com.makemytrip.makemytrip.repositories.FlightRepository;
 import com.makemytrip.makemytrip.repositories.HotelRepository;
+import com.makemytrip.makemytrip.repositories.PriceHistoryRepository;
 import com.makemytrip.makemytrip.repositories.UserRepository;
 
 @RestController
@@ -35,6 +37,9 @@ public class AdminController {
     @Autowired
     private FlightRepository flightRepository;
 
+    @Autowired
+    private PriceHistoryRepository priceHistoryRepository;
+
     @GetMapping("/users")
     public ResponseEntity<List<Users>> getallusers() {
         List<Users> users = userRepository.findAll();
@@ -43,7 +48,16 @@ public class AdminController {
 
     @PostMapping("/flight")
     public Flight addflight(@RequestBody Flight flight) {
-        return flightRepository.save(flight);
+        // Set the base price before saving
+        if (flight.getBasePrice() == 0) {
+            flight.setBasePrice(flight.getPrice());
+        }
+        Flight savedFlight = flightRepository.save(flight);
+
+        // Generate random price history entries (5-10 records over the past 7 days)
+        generateRandomPriceHistory(savedFlight.getId(), "FLIGHT", savedFlight.getPrice());
+
+        return savedFlight;
     }
 
     @PostMapping("/hotel")
@@ -85,4 +99,29 @@ public class AdminController {
         return ResponseEntity.notFound().build();
     }
 
+    /**
+     * Generates 5-10 random price history entries for a newly created entity.
+     * Simulates realistic price fluctuations over the past 7 days.
+     */
+    private void generateRandomPriceHistory(String entityId, String entityType, double basePrice) {
+        java.util.Random rand = new java.util.Random();
+        int count = 5 + rand.nextInt(6); // 5 to 10 entries
+        String[] reasons = {"BASE_PRICE", "DEMAND_SURGE", "SEASONAL", "LAST_MINUTE", "BASE_PRICE", "DEMAND_SURGE"};
+
+        double prevPrice = basePrice;
+        for (int i = count; i >= 0; i--) {
+            // Spread entries over the past 7 days
+            java.time.Instant timestamp = java.time.Instant.now().minus(java.time.Duration.ofHours(i * 24L / count + rand.nextInt(4)));
+
+            // Random variation ±15% from base
+            double variation = 0.85 + (rand.nextDouble() * 0.30);
+            double newPrice = Math.round(basePrice * variation * 100.0) / 100.0;
+            double multiplier = Math.round(variation * 100.0) / 100.0;
+            String reason = reasons[rand.nextInt(reasons.length)];
+
+            PriceHistory history = new PriceHistory(entityId, entityType, prevPrice, newPrice, multiplier, reason);
+            priceHistoryRepository.save(history);
+            prevPrice = newPrice;
+        }
+    }
 }
