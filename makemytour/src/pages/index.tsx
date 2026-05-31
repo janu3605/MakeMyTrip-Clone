@@ -242,7 +242,7 @@ export default function Home() {
   };
 
   const activeLiveTrips = user?.bookings
-    ?.filter((b: any) => b.type === "Flight")
+    ?.filter((b: any) => b?.type === "Flight")
     .map((b: any) => {
       const flightDetails = flight.find((f: any) => (f.id === b.bookingId || f._id === b.bookingId));
       return { ...b, flightDetails };

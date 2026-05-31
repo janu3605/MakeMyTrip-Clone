@@ -151,8 +151,8 @@ const index = () => {
 
     // Sort recent first, filter out COMPLETED refunds
     const displayBookings = [...(user?.bookings || [])]
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-        .filter((b) => b.refundStatus !== "COMPLETED");
+        .filter((b) => b && b.refundStatus !== "COMPLETED")
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     return (
         <div className="min-h-screen bg-gray-50 pt-8 px-4">
