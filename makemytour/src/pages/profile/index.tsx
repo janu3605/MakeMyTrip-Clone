@@ -37,32 +37,6 @@ const index = () => {
         lastName: user?.lastName ? user?.lastName : "",
         email: user?.email ? user?.email : "",
         phoneNumber: user?.phoneNumber ? user?.phoneNumber : "",
-        bookings: [
-            {
-                type: "Flight",
-                bookingId: "F123456",
-                date: "2024-03-25",
-                quantity: 2,
-                totalPrice: 12499,
-                details: {
-                    from: "Delhi",
-                    to: "Mumbai",
-                    airline: "IndiGo",
-                },
-            },
-            {
-                type: "Hotel",
-                bookingId: "H789012",
-                date: "2024-04-15",
-                quantity: 1,
-                totalPrice: 8999,
-                details: {
-                    name: "Taj Palace",
-                    location: "Goa",
-                    nights: 3,
-                },
-            },
-        ],
     });
 
     const [editForm, setEditForm] = useState({ ...userData });
@@ -93,7 +67,7 @@ const index = () => {
     const handleEditFormChange = (field: any, value: any) => {
         setUserData((prevState) => ({
             ...prevState,
-            [field]: value, // Update the specific field dynamically
+            [field]: value,
         }));
     };
 

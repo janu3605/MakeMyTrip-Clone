@@ -92,7 +92,7 @@ public class BookingService {
                 throw new RuntimeException("Not enough rooms available");
             }
         }
-        throw new RuntimeException("User or flight not found");
+        throw new RuntimeException("User or hotel not found");
     }
 
     public Booking cancelBooking(String userId, String uniqueBookingId, String reason) {
@@ -118,15 +118,15 @@ public class BookingService {
             throw new RuntimeException("Booking is already cancelled");
         }
 
-        // Calculate refund
+
         LocalDate bookingDate = LocalDate.parse(targetBooking.getDate());
         long daysBetween = ChronoUnit.DAYS.between(bookingDate, LocalDate.now());
         
         double refundPercent = 0.0;
         if (daysBetween <= 1) {
-            refundPercent = 0.50; // 50% refund within 24 hours
+            refundPercent = 0.50;
         } else {
-            refundPercent = 0.20; // 20% refund after 24 hours
+            refundPercent = 0.20;
         }
 
         targetBooking.setStatus("CANCELLED");
@@ -135,7 +135,7 @@ public class BookingService {
         targetBooking.setRefundStatus("PENDING");
         targetBooking.setCancellationDate(LocalDateTime.now().toString());
 
-        // Restore inventory
+
         if ("Flight".equalsIgnoreCase(targetBooking.getType())) {
             Optional<Flight> flightOpt = flightRepository.findById(targetBooking.getBookingId());
             if (flightOpt.isPresent()) {

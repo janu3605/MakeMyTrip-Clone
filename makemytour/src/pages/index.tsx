@@ -157,7 +157,7 @@ export default function Home() {
     setfrom("");
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
-    // We trigger the search using the updated values since state update is async
+
     const now = new Date();
     if (type === "flights") {
       const results = flight.filter((FLIGHT) => {
@@ -166,7 +166,7 @@ export default function Home() {
 
         return (
           FLIGHT.to.toLowerCase() === loc.toLowerCase() &&
-          timeDiffMinutes > 10 // RULE: Hide if less than 10 mins to boarding
+          timeDiffMinutes > 10
         );
       });
       setsearchresult(results);

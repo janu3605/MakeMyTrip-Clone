@@ -22,14 +22,14 @@ import { useEffect, useState } from "react";
 import { getflight, handleflightbooking } from "@/api";
 import { useDispatch, useSelector } from "react-redux";
 interface Flight {
-    id: string; // Unique identifier for the flight
-    flightName: string; // Name of the flight
-    from: string; // Departure location
-    to: string; // Arrival location
-    departureTime: string; // Departure time (ISO 8601 string recommended)
-    arrivalTime: string; // Arrival time (ISO 8601 string recommended)
-    price: number; // Price of the flight
-    availableSeats: number; // Number of available seats
+    id: string;
+    flightName: string;
+    from: string;
+    to: string;
+    departureTime: string;
+    arrivalTime: string;
+    price: number;
+    availableSeats: number;
 }
 import {
     Dialog,
@@ -61,7 +61,6 @@ const BookFlightPage = () => {
                 const data = await getflight();
                 const filteredData = data.filter((flight: any) => flight.id === id);
                 setFlights(filteredData);
-                console.log(filteredData);
             } catch (error) {
                 console.error("Error fetching flights:", error);
             } finally {
@@ -192,7 +191,7 @@ const BookFlightPage = () => {
             setQuantity(1);
             router.push("/profile");
         } catch (error) {
-            console.log(error);
+            console.error("Booking failed", error);
         }
     };
     const BookingContent = () => (

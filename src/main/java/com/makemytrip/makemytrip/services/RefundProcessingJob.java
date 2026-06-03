@@ -15,7 +15,7 @@ public class RefundProcessingJob {
     @Autowired
     private UserRepository userRepository;
 
-    @Scheduled(fixedRate = 120000) // Runs every 2 minutes
+    @Scheduled(fixedRate = 120000)
     public void processRefunds() {
         List<Users> users = userRepository.findAll();
         boolean anyUpdated = false;
@@ -40,8 +40,6 @@ public class RefundProcessingJob {
             }
         }
 
-        if (anyUpdated) {
-            System.out.println("RefundProcessingJob: Updated refund statuses.");
-        }
+
     }
 }

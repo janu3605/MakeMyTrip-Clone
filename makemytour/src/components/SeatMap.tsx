@@ -26,7 +26,7 @@ const getTier = (row: number) => {
 };
 
 export const SeatMap: React.FC<SeatMapProps> = ({ basePrice, availableSeats, quantity, onSeatSelect }) => {
-  // Generate randomized occupancy map — stable across re-renders
+
   const occupancyMap = useMemo(() => {
     const map: Record<string, boolean> = {};
     const totalSeats = TOTAL_ROWS * COLS.length;
@@ -37,9 +37,6 @@ export const SeatMap: React.FC<SeatMapProps> = ({ basePrice, availableSeats, qua
         allSeats.push(`${r}${c}`);
       }
     }
-    // Simple seeded shuffle using seat index
-    const shuffled = [...allSeats].sort(() => 0.5 - Math.sin(allSeats.length * 9.1) * 0.5 > 0.5 ? -1 : 1);
-    // Actually let's use a more deterministic approach
     for (let i = 0; i < allSeats.length; i++) {
       const hash = (i * 7 + 13) % 100;
       map[allSeats[i]] = hash < (bookedCount / totalSeats) * 100;
@@ -50,7 +47,7 @@ export const SeatMap: React.FC<SeatMapProps> = ({ basePrice, availableSeats, qua
   const [selectedSeats, setSelectedSeats] = useState<SeatSelection[]>([]);
 
   const handleSeatClick = (seatId: string, row: number, col: string) => {
-    if (occupancyMap[seatId]) return; // booked
+    if (occupancyMap[seatId]) return;
 
     const isSelected = selectedSeats.some((s) => s.seatId === seatId);
 
@@ -68,7 +65,7 @@ export const SeatMap: React.FC<SeatMapProps> = ({ basePrice, availableSeats, qua
         price: basePrice * tier.multiplier,
       };
       if (selectedSeats.length >= quantity) {
-        // Replace the oldest selection
+  
         updated = [...selectedSeats.slice(1), newSeat];
       } else {
         updated = [...selectedSeats, newSeat];

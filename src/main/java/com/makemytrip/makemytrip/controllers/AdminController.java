@@ -53,16 +53,12 @@ public class AdminController {
 
     @PostMapping("/flight")
     public Flight addflight(@RequestBody Flight flight) {
-        // Set the base price before saving
         if (flight.getBasePrice() == 0) {
             flight.setBasePrice(flight.getPrice());
         }
         Flight savedFlight = flightRepository.save(flight);
 
-        // Generate random price history entries (5-10 records over the past 7 days)
         generateRandomPriceHistory(savedFlight.getId(), "FLIGHT", savedFlight.getPrice());
-        
-        // Generate mock reviews
         generateMockReviews(savedFlight.getId(), "FLIGHT");
 
         return savedFlight;
@@ -109,13 +105,9 @@ public class AdminController {
         return ResponseEntity.notFound().build();
     }
 
-    /**
-     * Generates 5-10 random price history entries for a newly created entity.
-     * Simulates realistic price fluctuations over the past 7 days.
-     */
     private void generateRandomPriceHistory(String entityId, String entityType, double basePrice) {
         java.util.Random rand = new java.util.Random();
-        int count = 5 + rand.nextInt(6); // 5 to 10 entries
+        int count = 5 + rand.nextInt(6);
         String[] reasons = {"BASE_PRICE", "DEMAND_SURGE", "SEASONAL", "LAST_MINUTE", "BASE_PRICE", "DEMAND_SURGE"};
 
         double prevPrice = basePrice;
@@ -123,7 +115,6 @@ public class AdminController {
             // Spread entries over the past 7 days
             java.time.Instant timestamp = java.time.Instant.now().minus(java.time.Duration.ofHours(i * 24L / count + rand.nextInt(4)));
 
-            // Random variation ±15% from base
             double variation = 0.85 + (rand.nextDouble() * 0.30);
             double newPrice = Math.round(basePrice * variation * 100.0) / 100.0;
             double multiplier = Math.round(variation * 100.0) / 100.0;
@@ -154,7 +145,7 @@ public class AdminController {
 
     private void generateMockReviews(String entityId, String entityType) {
         java.util.Random rand = new java.util.Random();
-        int count = 3 + rand.nextInt(4); // 3 to 6 reviews
+        int count = 3 + rand.nextInt(4);
         String[] users = {"John Doe", "Jane Smith", "Alex Johnson", "Emily Davis", "Chris Brown", "Katie Wilson"};
         String[] titles = {"Great experience", "Good value for money", "Could be better", "Excellent service", "Not bad", "Loved it!"};
         String[] contents = {
@@ -170,14 +161,13 @@ public class AdminController {
             Review review = new Review();
             review.setEntityId(entityId);
             review.setEntityType(entityType);
-            review.setUserId(java.util.UUID.randomUUID().toString()); // Mock user ID
+            review.setUserId(java.util.UUID.randomUUID().toString());
             review.setUserName(users[rand.nextInt(users.length)]);
-            review.setRating(3 + rand.nextInt(3)); // 3, 4, or 5
+            review.setRating(3 + rand.nextInt(3));
             review.setTitle(titles[rand.nextInt(titles.length)]);
             review.setContent(contents[rand.nextInt(contents.length)]);
             review.setModerationStatus("APPROVED");
             
-            // Random past date
             java.time.Instant timestamp = java.time.Instant.now().minus(java.time.Duration.ofDays(rand.nextInt(30)));
             review.setCreatedAt(timestamp.toString());
             review.setUpdatedAt(timestamp.toString());

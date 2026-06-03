@@ -22,8 +22,8 @@ export default function RecommendationCarousel() {
       setLoading(true);
       try {
         let data: any[];
-        if (user && user._id) {
-          data = await getRecommendations(user._id, undefined);
+        if (user && user.id) {
+          data = await getRecommendations(user.id, undefined);
         } else {
           data = await getTrendingRecommendations();
         }
@@ -164,7 +164,7 @@ export default function RecommendationCarousel() {
                 reason={rec.reason}
                 reasonCode={rec.reasonCode}
                 feedback={rec.feedback}
-                userId={user?._id || ""}
+                userId={user?.id || ""}
               />
             </div>
           ))}

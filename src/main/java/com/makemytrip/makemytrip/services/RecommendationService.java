@@ -33,12 +33,10 @@ public class RecommendationService {
     @Autowired
     private RecommendationRepository recommendationRepository;
 
-    // ====== Destination → Category mapping ======
     private static final Map<String, String> DESTINATION_CATEGORIES = new HashMap<>();
     private static final Map<String, String> DESTINATION_IMAGES = new HashMap<>();
 
     static {
-        // Beach destinations
         DESTINATION_CATEGORIES.put("goa", "beach");
         DESTINATION_CATEGORIES.put("bali", "beach");
         DESTINATION_CATEGORIES.put("maldives", "beach");
@@ -50,7 +48,7 @@ public class RecommendationService {
         DESTINATION_CATEGORIES.put("kovalam", "beach");
         DESTINATION_CATEGORIES.put("mumbai", "beach");
 
-        // Mountain destinations
+
         DESTINATION_CATEGORIES.put("shimla", "mountain");
         DESTINATION_CATEGORIES.put("manali", "mountain");
         DESTINATION_CATEGORIES.put("darjeeling", "mountain");
@@ -63,7 +61,7 @@ public class RecommendationService {
         DESTINATION_CATEGORIES.put("srinagar", "mountain");
         DESTINATION_CATEGORIES.put("munnar", "mountain");
 
-        // City destinations
+
         DESTINATION_CATEGORIES.put("delhi", "city");
         DESTINATION_CATEGORIES.put("bangalore", "city");
         DESTINATION_CATEGORIES.put("bengaluru", "city");
@@ -76,7 +74,7 @@ public class RecommendationService {
         DESTINATION_CATEGORIES.put("dubai", "city");
         DESTINATION_CATEGORIES.put("bangkok", "city");
 
-        // Heritage destinations
+
         DESTINATION_CATEGORIES.put("jaipur", "heritage");
         DESTINATION_CATEGORIES.put("udaipur", "heritage");
         DESTINATION_CATEGORIES.put("agra", "heritage");
@@ -86,16 +84,13 @@ public class RecommendationService {
         DESTINATION_CATEGORIES.put("hampi", "heritage");
         DESTINATION_CATEGORIES.put("khajuraho", "heritage");
 
-        // Category images for fallback
+
         DESTINATION_IMAGES.put("beach", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800");
         DESTINATION_IMAGES.put("mountain", "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800");
         DESTINATION_IMAGES.put("city", "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=800");
         DESTINATION_IMAGES.put("heritage", "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=800");
     }
 
-    /**
-     * Get personalized recommendations for a user.
-     */
     public List<RecommendationResponse> getRecommendations(String userId, String type) {
         Optional<Users> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) {
@@ -109,37 +104,37 @@ public class RecommendationService {
             return getTrendingRecommendations();
         }
 
-        // Collect previously irrelevant entity IDs to skip
+
         List<Recommendation> irrelevant = recommendationRepository.findByUserIdAndFeedback(userId, "IRRELEVANT");
         Set<String> skipEntityIds = irrelevant.stream()
                 .map(Recommendation::getEntityId)
                 .collect(Collectors.toSet());
 
-        // Collect already-booked entity IDs
+
         Set<String> bookedIds = bookings.stream()
                 .map(Booking::getBookingId)
                 .collect(Collectors.toSet());
 
         List<Recommendation> candidates = new ArrayList<>();
 
-        // 1. Repeat Destination Affinity
+
         candidates.addAll(generateRepeatDestinationRecs(user, bookings, skipEntityIds, bookedIds));
 
-        // 2. Category-Based
+
         candidates.addAll(generateCategoryRecs(user, bookings, skipEntityIds, bookedIds));
 
-        // 3. Price-Range Matching
+
         candidates.addAll(generatePriceRangeRecs(user, bookings, skipEntityIds, bookedIds));
 
-        // 4. Collaborative Filtering
+
         candidates.addAll(generateCollaborativeRecs(user, bookings, skipEntityIds, bookedIds));
 
-        // 5. Fill with trending if not enough
+
         if (candidates.size() < 6) {
             candidates.addAll(generateTrendingRecs(skipEntityIds, bookedIds));
         }
 
-        // Deduplicate by entityId, keep highest score
+
         Map<String, Recommendation> deduped = new LinkedHashMap<>();
         for (Recommendation rec : candidates) {
             String key = rec.getEntityId();
@@ -148,28 +143,28 @@ public class RecommendationService {
             }
         }
 
-        // Sort by score descending, cap at 12
+
         List<Recommendation> finalList = deduped.values().stream()
                 .sorted(Comparator.comparingDouble(Recommendation::getScore).reversed())
                 .limit(12)
                 .collect(Collectors.toList());
 
-        // Filter by type if specified
+
         if (type != null && !type.isEmpty()) {
             finalList = finalList.stream()
                     .filter(r -> type.equalsIgnoreCase(r.getEntityType()))
                     .collect(Collectors.toList());
         }
 
-        // Persist recommendations
+
         for (Recommendation rec : finalList) {
             rec.setUserId(userId);
-            // Check if we already have this recommendation saved
+
             List<Recommendation> existing = recommendationRepository.findByUserIdAndEntityId(userId, rec.getEntityId());
             if (existing.isEmpty()) {
                 recommendationRepository.save(rec);
             } else {
-                // Update score and reason
+
                 Recommendation ex = existing.get(0);
                 ex.setScore(rec.getScore());
                 ex.setReason(rec.getReason());
@@ -183,9 +178,6 @@ public class RecommendationService {
         return finalList.stream().map(this::toResponse).collect(Collectors.toList());
     }
 
-    /**
-     * Get trending recommendations (for logged-out or new users).
-     */
     public List<RecommendationResponse> getTrendingRecommendations() {
         List<Recommendation> trending = generateTrendingRecs(Collections.emptySet(), Collections.emptySet());
         return trending.stream()
@@ -195,9 +187,6 @@ public class RecommendationService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Submit feedback on a recommendation.
-     */
     public Recommendation submitFeedback(String recommendationId, String userId, String feedback) {
         Optional<Recommendation> recOpt = recommendationRepository.findById(recommendationId);
         if (recOpt.isEmpty()) {
@@ -209,20 +198,15 @@ public class RecommendationService {
         return recommendationRepository.save(rec);
     }
 
-    // ========== ALGORITHM IMPLEMENTATIONS ==========
 
-    /**
-     * Algorithm 1: Repeat Destination Affinity
-     * If a user has booked flights/hotels to the same destination multiple times,
-     * suggest other options in that same location.
-     */
+
     private List<Recommendation> generateRepeatDestinationRecs(Users user, List<Booking> bookings,
             Set<String> skipEntityIds, Set<String> bookedIds) {
         List<Recommendation> recs = new ArrayList<>();
         List<Flight> allFlights = flightRepository.findAll();
         List<Hotel> allHotels = hotelRepository.findAll();
 
-        // Count destination frequency from flight bookings
+
         Map<String, Integer> destFrequency = new HashMap<>();
         for (Booking b : bookings) {
             if ("CANCELLED".equals(b.getStatus())) continue;
@@ -243,13 +227,13 @@ public class RecommendationService {
             }
         }
 
-        // For destinations visited 2+ times, suggest other hotels/flights there
+
         for (Map.Entry<String, Integer> entry : destFrequency.entrySet()) {
             if (entry.getValue() >= 2) {
                 String dest = entry.getKey();
                 int visits = entry.getValue();
 
-                // Suggest hotels in that location
+
                 for (Hotel h : allHotels) {
                     if (h.getLocation().toLowerCase().contains(dest)
                             && !bookedIds.contains(h.getId())
@@ -269,7 +253,7 @@ public class RecommendationService {
                     }
                 }
 
-                // Suggest flights to that destination
+
                 for (Flight f : allFlights) {
                     if (f.getTo().toLowerCase().contains(dest)
                             && !bookedIds.contains(f.getId())
@@ -294,18 +278,13 @@ public class RecommendationService {
         return recs;
     }
 
-    /**
-     * Algorithm 2: Category-Based Recommendations
-     * Maps destinations to categories (beach, mountain, etc.) and suggests
-     * similar-category destinations the user hasn't visited.
-     */
     private List<Recommendation> generateCategoryRecs(Users user, List<Booking> bookings,
             Set<String> skipEntityIds, Set<String> bookedIds) {
         List<Recommendation> recs = new ArrayList<>();
         List<Hotel> allHotels = hotelRepository.findAll();
         List<Flight> allFlights = flightRepository.findAll();
 
-        // Determine user's preferred categories
+
         Map<String, Integer> categoryFrequency = new HashMap<>();
         Set<String> visitedLocations = new HashSet<>();
 
@@ -338,7 +317,7 @@ public class RecommendationService {
             }
         }
 
-        // Find the top category
+
         String topCategory = categoryFrequency.entrySet().stream()
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
@@ -348,7 +327,7 @@ public class RecommendationService {
 
         String categoryLabel = getCategoryLabel(topCategory);
 
-        // Suggest hotels in same category but different locations
+
         for (Hotel h : allHotels) {
             String hLoc = h.getLocation().toLowerCase();
             String hCat = getCategoryForLocation(hLoc);
@@ -371,7 +350,7 @@ public class RecommendationService {
             }
         }
 
-        // Suggest flights to same category destinations
+
         for (Flight f : allFlights) {
             String fDest = f.getTo().toLowerCase();
             String fCat = getCategoryForLocation(fDest);
@@ -397,10 +376,6 @@ public class RecommendationService {
         return recs;
     }
 
-    /**
-     * Algorithm 3: Price-Range Matching
-     * Suggests items within ±30% of the user's average booking price.
-     */
     private List<Recommendation> generatePriceRangeRecs(Users user, List<Booking> bookings,
             Set<String> skipEntityIds, Set<String> bookedIds) {
         List<Recommendation> recs = new ArrayList<>();
@@ -462,11 +437,6 @@ public class RecommendationService {
         return recs;
     }
 
-    /**
-     * Algorithm 4: Simplified Collaborative Filtering
-     * Finds users with similar booking patterns and recommends items they
-     * booked that the current user hasn't.
-     */
     private List<Recommendation> generateCollaborativeRecs(Users user, List<Booking> bookings,
             Set<String> skipEntityIds, Set<String> bookedIds) {
         List<Recommendation> recs = new ArrayList<>();
@@ -474,7 +444,7 @@ public class RecommendationService {
         List<Hotel> allHotels = hotelRepository.findAll();
         List<Flight> allFlights = flightRepository.findAll();
 
-        // Find similar users: those who booked at least 2 of the same entities
+
         for (Users other : allUsers) {
             if (other.getId().equals(user.getId())) continue;
             if (other.getBookings() == null || other.getBookings().isEmpty()) continue;
@@ -484,14 +454,14 @@ public class RecommendationService {
                     .map(Booking::getBookingId)
                     .collect(Collectors.toSet());
 
-            // Count overlap
+
             long overlap = bookedIds.stream().filter(otherBookedIds::contains).count();
 
             if (overlap >= 2) {
-                // Recommend items the similar user booked that this user hasn't
+
                 for (String entityId : otherBookedIds) {
                     if (!bookedIds.contains(entityId) && !skipEntityIds.contains(entityId)) {
-                        // Find the entity details
+
                         Hotel hotel = allHotels.stream()
                                 .filter(h -> h.getId().equals(entityId))
                                 .findFirst().orElse(null);
@@ -536,17 +506,13 @@ public class RecommendationService {
         return recs;
     }
 
-    /**
-     * Algorithm 5: Trending / Popular
-     * Shows globally most-booked items based on all users' booking frequency.
-     */
     private List<Recommendation> generateTrendingRecs(Set<String> skipEntityIds, Set<String> bookedIds) {
         List<Recommendation> recs = new ArrayList<>();
         List<Users> allUsers = userRepository.findAll();
         List<Hotel> allHotels = hotelRepository.findAll();
         List<Flight> allFlights = flightRepository.findAll();
 
-        // Count booking frequency for each entity
+
         Map<String, Integer> entityFrequency = new HashMap<>();
         for (Users u : allUsers) {
             if (u.getBookings() == null) continue;
@@ -557,7 +523,7 @@ public class RecommendationService {
             }
         }
 
-        // Sort by frequency, pick top items
+
         List<Map.Entry<String, Integer>> sorted = entityFrequency.entrySet().stream()
                 .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
                 .limit(20)
@@ -607,7 +573,7 @@ public class RecommendationService {
             }
         }
 
-        // If we still have too few, fill with random available entities
+
         if (recs.size() < 6) {
             for (Hotel h : allHotels) {
                 if (recs.size() >= 12) break;
@@ -650,7 +616,7 @@ public class RecommendationService {
         return recs;
     }
 
-    // ========== HELPER METHODS ==========
+
 
     private RecommendationResponse toResponse(Recommendation rec) {
         RecommendationResponse resp = new RecommendationResponse();

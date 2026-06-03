@@ -58,7 +58,6 @@ public class FlightTrackingService {
                 return LocalDateTime.now().withHour(h).withMinute(m).withSecond(0);
             }
         } catch (Exception e) {
-            System.out.println("Could not parse date: " + dateStr);
         }
         return LocalDateTime.now().plusDays(1); 
     }
@@ -83,7 +82,6 @@ public class FlightTrackingService {
         if (emitters.isEmpty()) {
             return;
         }
-        System.out.println("Radar Tick: Pushing to " + emitters.size() + " clients.");
 
         List<Flight> allFlights = flightRepository.findAll();
         Map<String, FlightStatusUpdate> updates = new HashMap<>();
@@ -109,16 +107,16 @@ public class FlightTrackingService {
                     status = "LANDED";
                     progress = 100;
                     message = "Arrived Safely";
-                    // Clear any delay reason once landed
+
                     customReasons.remove(f.getId());
                 } else {
-                    // Flight is in air — check for random delay
+
                     long total = Duration.between(dep, arr).toSeconds();
                     long elapsed = Duration.between(dep, now).toSeconds();
                     progress = total > 0 ? (int) ((elapsed * 100) / total) : 100;
                     progress = Math.min(Math.max(progress, 0), 100);
 
-                    // ~15% chance of delay per tick (only apply once via customReasons)
+
                     if (!customReasons.containsKey(f.getId()) && random.nextInt(100) < 15) {
                         String delayReason = DELAY_REASONS[random.nextInt(DELAY_REASONS.length)];
                         customReasons.put(f.getId(), delayReason);
@@ -139,7 +137,6 @@ public class FlightTrackingService {
                         f.getId(), status, message, reason, progress
                 ));
             } catch (Exception e) {
-                System.out.println("Format error on Flight " + f.getId());
             }
         }
 

@@ -20,7 +20,7 @@ public class Users {
     private double mockBalance = 50000.0;
     private List<Booking> bookings = new ArrayList<>();
 
-    ;
+
 
 
     public String getFirstName() {
@@ -150,7 +150,7 @@ public class Users {
             this.cancellationDate = cancellationDate;
         }
 
-        // Getters and Setters
+
         public String getType() {
             return type;
         }

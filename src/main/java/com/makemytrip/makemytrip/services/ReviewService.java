@@ -27,23 +27,22 @@ public class ReviewService {
     private UserRepository userRepository;
 
     public Review createReview(ReviewRequest request) {
-        // Validate rating
         if (request.getRating() < 1 || request.getRating() > 5) {
             throw new RuntimeException("Rating must be between 1 and 5");
         }
 
-        // Validate entityType
+
         if (!"FLIGHT".equals(request.getEntityType()) && !"HOTEL".equals(request.getEntityType())) {
             throw new RuntimeException("Entity type must be FLIGHT or HOTEL");
         }
 
-        // Check user exists
+
         Optional<Users> userOpt = userRepository.findById(request.getUserId());
         if (userOpt.isEmpty()) {
             throw new RuntimeException("User not found");
         }
 
-        // Check for duplicate review
+
         if (reviewRepository.existsByUserIdAndEntityIdAndEntityType(
                 request.getUserId(), request.getEntityId(), request.getEntityType())) {
             throw new RuntimeException("You have already reviewed this entity");
