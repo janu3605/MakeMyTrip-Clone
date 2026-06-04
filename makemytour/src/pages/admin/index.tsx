@@ -162,7 +162,7 @@ interface Hotel {
     amenities: string;
 }
 
-function AddEditHotel({ hotel }: { hotel: Hotel | null }) {
+function AddEditHotel({ hotel, onSuccess }: { hotel: Hotel | null, onSuccess?: () => void }) {
     const [formData, setFormData] = useState<Hotel>({
         hotelName: "",
         location: "",
@@ -203,6 +203,7 @@ function AddEditHotel({ hotel }: { hotel: Hotel | null }) {
                 formData.availableRooms,
                 formData.amenities
             );
+            onSuccess?.();
             return;
         }
         await addhotel(
@@ -212,6 +213,7 @@ function AddEditHotel({ hotel }: { hotel: Hotel | null }) {
             formData.availableRooms,
             formData.amenities
         );
+        onSuccess?.();
         if (!hotel) {
             setFormData({
                 hotelName: "",
@@ -296,7 +298,7 @@ interface Flight {
     availableSeats: number;
 }
 
-function AddEditFlight({ flight }: { flight: Flight | null }) {
+function AddEditFlight({ flight, onSuccess }: { flight: Flight | null, onSuccess?: () => void }) {
     const [formData, setFormData] = useState<Flight>({
         flightName: "",
         from: "",
@@ -343,6 +345,7 @@ function AddEditFlight({ flight }: { flight: Flight | null }) {
                 formData.price,
                 formData.availableSeats
             );
+            onSuccess?.();
             return;
         }
         await addflight(
@@ -354,6 +357,7 @@ function AddEditFlight({ flight }: { flight: Flight | null }) {
             formData.price,
             formData.availableSeats
         );
+        onSuccess?.();
         if (!flight) {
             setFormData({
                 flightName: "",
@@ -683,6 +687,8 @@ export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState("flights");
     const [selectedFlight, setSelectedFlight] = useState(null);
     const [selectedHotel, setSelectedHotel] = useState(null);
+    const [refreshFlights, setRefreshFlights] = useState(0);
+    const [refreshHotels, setRefreshHotels] = useState(0);
 
     return (
         <div className="container mx-auto p-4 bg-white max-w-full">
@@ -705,8 +711,8 @@ export default function AdminDashboard() {
                         </CardHeader>
                         <CardContent>
                             <div className="grid grid-cols-2 gap-4">
-                                <FlightList onSelect={setSelectedFlight} />
-                                <AddEditFlight flight={selectedFlight} />
+                                <FlightList onSelect={setSelectedFlight} refreshTrigger={refreshFlights} />
+                                <AddEditFlight flight={selectedFlight} onSuccess={() => setRefreshFlights(v => v + 1)} />
                             </div>
                         </CardContent>
                     </Card>
@@ -721,8 +727,8 @@ export default function AdminDashboard() {
                         </CardHeader>
                         <CardContent>
                             <div className="grid grid-cols-2 gap-4">
-                                <HotelList onSelect={setSelectedHotel} />
-                                <AddEditHotel hotel={selectedHotel} />
+                                <HotelList onSelect={setSelectedHotel} refreshTrigger={refreshHotels} />
+                                <AddEditHotel hotel={selectedHotel} onSuccess={() => setRefreshHotels(v => v + 1)} />
                             </div>
                         </CardContent>
                     </Card>

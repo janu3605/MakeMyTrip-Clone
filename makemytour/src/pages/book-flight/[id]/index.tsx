@@ -194,7 +194,7 @@ const BookFlightPage = () => {
             console.error("Booking failed", error);
         }
     };
-    const BookingContent = () => (
+    const bookingContent = (
         <DialogContent className="sm:max-w-[600px] bg-white">
             <DialogHeader>
                 <DialogTitle className="text-2xl font-bold flex items-center">
@@ -581,7 +581,7 @@ const BookFlightPage = () => {
                                     </Button>
                                 </DialogTrigger>
                                 {user ? (
-                                    <BookingContent />
+                                    bookingContent
                                 ) : (
                                     <DialogContent className="bg-white">
                                         <DialogHeader>

@@ -10,7 +10,7 @@ import { Button } from "../ui/button";
 import { useEffect, useState } from "react";
 import { getflight } from "@/api";
 import Loader from "../Loader";
-const FlightList = ({ onSelect }: any) => {
+const FlightList = ({ onSelect, refreshTrigger }: any) => {
     const [flight, setflight] = useState<any[]>([]);
     const [loading, setloading] = useState(true);
     useEffect(() => {
@@ -25,7 +25,7 @@ const FlightList = ({ onSelect }: any) => {
             }
         };
         fetchflight();
-    }, []);
+    }, [refreshTrigger]);
 
     if (loading) {
         return <Loader />;

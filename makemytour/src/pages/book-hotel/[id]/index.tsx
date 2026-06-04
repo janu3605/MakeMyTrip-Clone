@@ -145,7 +145,7 @@ const BookHotelPage = () => {
             console.log(error);
         }
     };
-    const HotelContent = () => (
+    const hotelContent = (
         <DialogContent className="sm:max-w-[600px] bg-white">
             <DialogHeader>
                 <DialogTitle className="text-2xl font-bold flex items-center">
@@ -457,7 +457,7 @@ const BookHotelPage = () => {
                                     </button>
                                 </DialogTrigger>
                                 {user ? (
-                                    <HotelContent />
+                                    hotelContent
                                 ) : (
                                     <DialogContent className="bg-white">
                                         <DialogHeader>

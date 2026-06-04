@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { gethotel } from "@/api";
 import Loader from "../Loader";
 
-const HotelList = ({ onSelect }: any) => {
+const HotelList = ({ onSelect, refreshTrigger }: any) => {
     const [hotel, sethotel] = useState<any[]>([]);
     const [loading, setloading] = useState(true);
     useEffect(() => {
@@ -26,7 +26,7 @@ const HotelList = ({ onSelect }: any) => {
             }
         };
         fetchhotel();
-    }, []);
+    }, [refreshTrigger]);
 
     if (loading) {
         return <Loader />;
